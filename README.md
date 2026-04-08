@@ -1,12 +1,5 @@
 <div align="center">
 
-<pre>
-booting profile...
-loading modules...
-initializing environment...
-system online.
-</pre>
-
 </div>
 
 <div align="center">
@@ -29,14 +22,6 @@ system online.
 
 <div align="center">
 
-<pre>
-&gt; modules
-[01] projects
-[02] github
-[03] linkedin
-[04] portfolio
-</pre>
-
 [projects](https://github.com/Jake177?tab=repositories) •
 [github](https://github.com/Jake177) •
 [linkedin](https://www.linkedin.com/in/jianhui-l-387223106/) •
@@ -48,8 +33,5 @@ system online.
 
 <div align="center">
 
-<pre>
-session saved.
-</pre>
 
 </div>
