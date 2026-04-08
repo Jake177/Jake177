@@ -1,7 +1,11 @@
 <div align="center">
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/Jake177/Jake177/output/github-snake.gif" alt="Terminal Neon Snake animation" />
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Jake177/Jake177/output/github-snake-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Jake177/Jake177/output/github-snake.svg">
+  <img alt="Red snake animation" src="https://raw.githubusercontent.com/Jake177/Jake177/output/github-snake.svg">
+</picture>
+
 </div>
 
 <div align="center">
