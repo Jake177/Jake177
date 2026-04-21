@@ -112,7 +112,7 @@ def build_contours(palette: Palette, rng: random.Random) -> str:
         lines.append(
             f"""
       <path d="{path_a}" stroke="url(#{gradient_id})" stroke-width="1.1" stroke-linecap="round"
-            stroke-dasharray="{dash} {dash + 18}" opacity="{0.18 + index * 0.035:.3f}">
+            stroke-dasharray="{dash} {dash + 18}" opacity="{0.10 + index * 0.022:.3f}">
         <animate attributeName="d" values="{path_a};{path_b};{path_a}" dur="{duration:.1f}s" repeatCount="indefinite" />
         <animate attributeName="stroke-dashoffset" values="0;{dash * -2};0" dur="{duration * 1.2:.1f}s" repeatCount="indefinite" />
       </path>"""
@@ -130,7 +130,7 @@ def build_haze(palette: Palette, rng: random.Random) -> str:
         ry = 110 + index * 12
         drift = 40 + index * 14
         duration = 22 + index * 6
-        opacity = 0.16 if index != 1 else 0.22
+        opacity = 0.10 if index != 1 else 0.15
         ellipses.append(
             f"""
       <ellipse cx="{cx:.1f}" cy="{cy:.1f}" rx="{rx:.1f}" ry="{ry:.1f}" fill="{palette.haze}" opacity="{opacity:.2f}">
@@ -142,112 +142,293 @@ def build_haze(palette: Palette, rng: random.Random) -> str:
     return "\n".join(ellipses)
 
 
-def build_orbit_group(cx: float, cy: float, radius: float, palette: Palette, duration: float, reverse: bool = False) -> str:
-    direction = "-360" if reverse else "360"
-    start = f"{cx} {cy}"
-    ring_color = palette.secondary
-    return f"""
-    <g transform="translate({cx} {cy})" opacity="0.72">
-      <circle cx="0" cy="0" r="{radius:.1f}" stroke="{ring_color}" stroke-width="1.1" stroke-dasharray="5 9" opacity="0.38" />
-      <circle cx="0" cy="0" r="{radius - 16:.1f}" stroke="{palette.contour}" stroke-width="0.9" stroke-dasharray="3 10" opacity="0.24" />
-      <circle cx="{radius:.1f}" cy="0" r="3.2" fill="{palette.accent}" opacity="0.85" />
-      <circle cx="{-(radius - 16):.1f}" cy="0" r="2.3" fill="{palette.particle}" opacity="0.92" />
-      <animateTransform attributeName="transform" attributeType="XML"
-                        type="rotate" from="0 {start}" to="{direction} {start}"
-                        dur="{duration:.1f}s" repeatCount="indefinite" additive="sum" />
-    </g>"""
+def polar_point(cx: float, cy: float, radius: float, angle_deg: float) -> tuple[float, float]:
+    angle = math.radians(angle_deg)
+    return cx + math.cos(angle) * radius, cy + math.sin(angle) * radius
 
 
-def build_connector_lines(targets: list[tuple[float, float]], palette: Palette, rng: random.Random) -> str:
-    ordered = sorted(targets, key=lambda point: (point[1], point[0]))
-    stride = max(1, len(ordered) // 16)
-    chosen = ordered[::stride][:16]
+def build_panel_grid(palette: Palette) -> str:
     lines: list[str] = []
 
-    for index in range(len(chosen) - 1):
-        x1, y1 = chosen[index]
-        x2, y2 = chosen[index + 1]
-        mid_x = (x1 + x2) / 2 + rng.uniform(-14, 14)
-        mid_y = (y1 + y2) / 2 + rng.uniform(-10, 10)
-        delay = index * 0.35
-        duration = 9 + index * 0.7
+    for x in range(84, WIDTH, 84):
         lines.append(
             f"""
-      <path d="M {x1:.1f} {y1:.1f} Q {mid_x:.1f} {mid_y:.1f} {x2:.1f} {y2:.1f}"
-            stroke="{palette.secondary}" stroke-width="0.9" fill="none" opacity="0.0">
-        <animate attributeName="opacity" values="0;0.32;0.18;0" dur="{duration:.1f}s" begin="{delay:.1f}s" repeatCount="indefinite" />
-      </path>"""
+      <line x1="{x}" y1="34" x2="{x}" y2="{HEIGHT - 34}" stroke="{palette.label}" stroke-width="0.85"
+            stroke-opacity="0.06" stroke-dasharray="3 10">
+        <animate attributeName="stroke-dashoffset" values="0;-26" dur="{28 + (x % 5) * 3}s" repeatCount="indefinite" />
+      </line>"""
+        )
+
+    for y in range(64, HEIGHT, 52):
+        lines.append(
+            f"""
+      <line x1="34" y1="{y}" x2="{WIDTH - 34}" y2="{y}" stroke="{palette.label}" stroke-width="0.8"
+            stroke-opacity="0.07" stroke-dasharray="4 11">
+        <animate attributeName="stroke-dashoffset" values="0;30" dur="{22 + (y % 4) * 4}s" repeatCount="indefinite" />
+      </line>"""
         )
 
     return "\n".join(lines)
 
 
-def build_text_particles(targets: list[tuple[float, float]], palette: Palette, rng: random.Random) -> str:
-    particles: list[str] = []
+def build_corner_brackets(palette: Palette) -> str:
+    color = palette.label
+    size = 26
+    edge = 36
+    points = [
+        (edge, edge, 1, 1),
+        (WIDTH - edge, edge, -1, 1),
+        (edge, HEIGHT - edge, 1, -1),
+        (WIDTH - edge, HEIGHT - edge, -1, -1),
+    ]
+    brackets: list[str] = []
 
-    for index, (target_x, target_y) in enumerate(targets):
-        origin_x = target_x + rng.uniform(-170, 170)
-        origin_y = target_y + rng.uniform(-110, 110)
-        drift_x = target_x + rng.uniform(-8, 8)
-        drift_y = target_y + rng.uniform(-8, 8)
-        begin = rng.uniform(0, 8)
-        duration = 14 + (index % 9) * 1.1
-        radius = 1.4 + (index % 3) * 0.45
-        opacity_peak = 0.5 + (index % 4) * 0.09
-        particles.append(
+    for x, y, dx, dy in points:
+        brackets.append(
             f"""
-      <circle cx="{origin_x:.2f}" cy="{origin_y:.2f}" r="{radius:.2f}" fill="{palette.particle}" opacity="0.0">
-        <animate attributeName="cx" values="{origin_x:.2f};{target_x:.2f};{drift_x:.2f};{origin_x:.2f}" keyTimes="0;0.34;0.68;1"
-                 dur="{duration:.1f}s" begin="{begin:.2f}s" repeatCount="indefinite" />
-        <animate attributeName="cy" values="{origin_y:.2f};{target_y:.2f};{drift_y:.2f};{origin_y:.2f}" keyTimes="0;0.34;0.68;1"
-                 dur="{duration:.1f}s" begin="{begin:.2f}s" repeatCount="indefinite" />
-        <animate attributeName="opacity" values="0;{opacity_peak:.2f};{opacity_peak:.2f};0" keyTimes="0;0.28;0.70;1"
-                 dur="{duration:.1f}s" begin="{begin:.2f}s" repeatCount="indefinite" />
+      <path d="M {x} {y + dy * size} L {x} {y} L {x + dx * size} {y}"
+            stroke="{color}" stroke-width="1.8" stroke-linecap="round" stroke-opacity="0.30" />"""
+        )
+
+    return "\n".join(brackets)
+
+
+def build_tick_ring(
+    cx: float,
+    cy: float,
+    radius: float,
+    count: int,
+    palette: Palette,
+    opacity: float,
+    inner_offset: float,
+    outer_offset: float,
+    duration: float | None = None,
+    reverse: bool = False,
+) -> str:
+    ticks: list[str] = []
+
+    for index in range(count):
+        angle = index * 360 / count
+        x1, y1 = polar_point(cx, cy, radius - inner_offset, angle)
+        x2, y2 = polar_point(cx, cy, radius + outer_offset, angle)
+        stroke_width = 1.35 if index % max(1, count // 12) == 0 else 0.75
+        tick_opacity = opacity * (1.22 if stroke_width > 1 else 0.78)
+        ticks.append(
+            f'<line x1="{x1:.2f}" y1="{y1:.2f}" x2="{x2:.2f}" y2="{y2:.2f}" '
+            f'stroke="{palette.label}" stroke-width="{stroke_width:.2f}" stroke-opacity="{tick_opacity:.3f}" />'
+        )
+
+    body = "\n      ".join(ticks)
+    if duration is None:
+        return f"\n    <g>\n      {body}\n    </g>"
+
+    angle_to = "-360" if reverse else "360"
+    return f"""
+    <g>
+      {body}
+      <animateTransform attributeName="transform" type="rotate"
+                        from="0 {cx} {cy}" to="{angle_to} {cx} {cy}"
+                        dur="{duration:.1f}s" repeatCount="indefinite" />
+    </g>"""
+
+
+def build_mechanical_core(palette: Palette) -> str:
+    cx = WIDTH / 2
+    cy = HEIGHT / 2 + 2
+
+    return f"""
+    <g>
+      <circle cx="{cx}" cy="{cy}" r="132" stroke="{palette.label}" stroke-width="1.1" stroke-opacity="0.18" />
+      <circle cx="{cx}" cy="{cy}" r="116" stroke="{palette.contour}" stroke-width="0.9"
+              stroke-dasharray="10 18" stroke-opacity="0.18">
+        <animate attributeName="stroke-dashoffset" values="0;112" dur="34s" repeatCount="indefinite" />
+      </circle>
+      <circle cx="{cx}" cy="{cy}" r="92" stroke="{palette.secondary}" stroke-width="1.1"
+              stroke-dasharray="28 14 8 20" stroke-opacity="0.28">
+        <animateTransform attributeName="transform" type="rotate"
+                          from="0 {cx} {cy}" to="360 {cx} {cy}"
+                          dur="48s" repeatCount="indefinite" />
+      </circle>
+      <circle cx="{cx}" cy="{cy}" r="60" stroke="{palette.accent}" stroke-width="0.95"
+              stroke-dasharray="6 12" stroke-opacity="0.28">
+        <animateTransform attributeName="transform" type="rotate"
+                          from="0 {cx} {cy}" to="-360 {cx} {cy}"
+                          dur="26s" repeatCount="indefinite" />
+      </circle>
+      {build_tick_ring(cx, cy, 122, 72, palette, 0.24, 6, 4)}
+      {build_tick_ring(cx, cy, 88, 36, palette, 0.22, 5, 4, duration=40, reverse=True)}
+      <line x1="{cx - 154}" y1="{cy}" x2="{cx + 154}" y2="{cy}" stroke="{palette.label}" stroke-width="0.9" stroke-opacity="0.12" />
+      <line x1="{cx}" y1="{cy - 154}" x2="{cx}" y2="{cy + 154}" stroke="{palette.label}" stroke-width="0.9" stroke-opacity="0.10" />
+      <rect x="{cx - 26}" y="{cy - 26}" width="52" height="52" rx="8"
+            stroke="{palette.secondary}" stroke-width="1.2" stroke-opacity="0.32" fill="none" />
+      <rect x="{cx - 12}" y="{cy - 12}" width="24" height="24" rx="4"
+            fill="{palette.particle}" fill-opacity="0.14" stroke="{palette.label}" stroke-opacity="0.24" />
+      <path d="M {cx - 18} {cy - 68} L {cx - 18} {cy - 96} L {cx + 18} {cy - 96} L {cx + 18} {cy - 68}"
+            stroke="{palette.label}" stroke-width="1.0" stroke-opacity="0.26" fill="none" />
+      <path d="M {cx - 18} {cy + 68} L {cx - 18} {cy + 96} L {cx + 18} {cy + 96} L {cx + 18} {cy + 68}"
+            stroke="{palette.label}" stroke-width="1.0" stroke-opacity="0.26" fill="none" />
+      <path d="M {cx - 68} {cy - 18} L {cx - 96} {cy - 18} L {cx - 96} {cy + 18} L {cx - 68} {cy + 18}"
+            stroke="{palette.label}" stroke-width="1.0" stroke-opacity="0.26" fill="none" />
+      <path d="M {cx + 68} {cy - 18} L {cx + 96} {cy - 18} L {cx + 96} {cy + 18} L {cx + 68} {cy + 18}"
+            stroke="{palette.label}" stroke-width="1.0" stroke-opacity="0.26" fill="none" />
+      <g>
+        <line x1="{cx}" y1="{cy}" x2="{cx + 108}" y2="{cy - 28}" stroke="{palette.accent}" stroke-width="1.3" stroke-opacity="0.55" />
+        <circle cx="{cx + 108}" cy="{cy - 28}" r="4.0" fill="{palette.accent}" fill-opacity="0.88" />
+        <animateTransform attributeName="transform" type="rotate"
+                          from="0 {cx} {cy}" to="360 {cx} {cy}"
+                          dur="24s" repeatCount="indefinite" />
+      </g>
+      <g>
+        <line x1="{cx}" y1="{cy}" x2="{cx - 76}" y2="{cy + 18}" stroke="{palette.secondary}" stroke-width="1.1" stroke-opacity="0.48" />
+        <circle cx="{cx - 76}" cy="{cy + 18}" r="3.0" fill="{palette.secondary}" fill-opacity="0.86" />
+        <animateTransform attributeName="transform" type="rotate"
+                          from="0 {cx} {cy}" to="-360 {cx} {cy}"
+                          dur="16s" repeatCount="indefinite" />
+      </g>
+    </g>"""
+
+
+def build_aux_module(cx: float, cy: float, radius: float, palette: Palette, duration: float, reverse: bool = False) -> str:
+    direction = "-360" if reverse else "360"
+    return f"""
+    <g>
+      <rect x="{cx - radius - 22:.1f}" y="{cy - radius - 18:.1f}" width="{radius * 2 + 44:.1f}" height="{radius * 2 + 36:.1f}" rx="18"
+            stroke="{palette.label}" stroke-width="0.95" stroke-opacity="0.16" fill="none" />
+      <circle cx="{cx}" cy="{cy}" r="{radius:.1f}" stroke="{palette.label}" stroke-width="1.0" stroke-opacity="0.22" />
+      <circle cx="{cx}" cy="{cy}" r="{radius - 16:.1f}" stroke="{palette.contour}" stroke-width="0.9"
+              stroke-dasharray="5 10" stroke-opacity="0.24">
+        <animate attributeName="stroke-dashoffset" values="0;60" dur="{duration * 0.8:.1f}s" repeatCount="indefinite" />
+      </circle>
+      {build_tick_ring(cx, cy, radius - 6, 24, palette, 0.20, 3, 3)}
+      <g>
+        <line x1="{cx}" y1="{cy}" x2="{cx + radius - 10:.1f}" y2="{cy}" stroke="{palette.accent}" stroke-width="1.2" stroke-opacity="0.50" />
+        <circle cx="{cx + radius - 10:.1f}" cy="{cy}" r="2.7" fill="{palette.accent}" fill-opacity="0.90" />
+        <animateTransform attributeName="transform" type="rotate"
+                          from="0 {cx} {cy}" to="{direction} {cx} {cy}"
+                          dur="{duration:.1f}s" repeatCount="indefinite" />
+      </g>
+      <rect x="{cx - 11:.1f}" y="{cy - 11:.1f}" width="22" height="22" rx="4"
+            fill="{palette.particle}" fill-opacity="0.12" stroke="{palette.label}" stroke-opacity="0.20" />
+    </g>"""
+
+
+def build_signal_bus(palette: Palette) -> str:
+    y = HEIGHT / 2 + 2
+    return f"""
+    <g>
+      <path d="M 118 {y} L 214 {y} L 266 {y - 30} L 346 {y - 30} L 388 {y}"
+            stroke="{palette.secondary}" stroke-width="1.3" fill="none" stroke-opacity="0.34" stroke-dasharray="8 10">
+        <animate attributeName="stroke-dashoffset" values="0;-72" dur="18s" repeatCount="indefinite" />
+      </path>
+      <path d="M 572 {y} L 614 {y - 30} L 694 {y - 30} L 746 {y} L 842 {y}"
+            stroke="{palette.secondary}" stroke-width="1.3" fill="none" stroke-opacity="0.34" stroke-dasharray="8 10">
+        <animate attributeName="stroke-dashoffset" values="0;72" dur="18s" repeatCount="indefinite" />
+      </path>
+      <line x1="388" y1="{y}" x2="572" y2="{y}" stroke="{palette.label}" stroke-width="1.0" stroke-opacity="0.16" stroke-dasharray="6 14" />
+      <rect x="262" y="{y - 34}" width="88" height="8" rx="4" fill="{palette.label}" fill-opacity="0.07" />
+      <rect x="610" y="{y - 34}" width="88" height="8" rx="4" fill="{palette.label}" fill-opacity="0.07" />
+    </g>"""
+
+
+def build_probe_pulses(palette: Palette, rng: random.Random) -> str:
+    y = HEIGHT / 2 + 2
+    pulses: list[str] = []
+    rails = [
+        ((118, y), (388, y)),
+        ((572, y), (842, y)),
+        ((WIDTH / 2, 58), (WIDTH / 2, HEIGHT - 58)),
+    ]
+
+    for index, ((x1, y1), (x2, y2)) in enumerate(rails):
+        begin = index * 0.9
+        duration = 7 + index * 1.8
+        pulses.append(
+            f"""
+      <circle cx="{x1:.1f}" cy="{y1:.1f}" r="{2.4 + index * 0.4:.1f}" fill="{palette.accent}" fill-opacity="0.0">
+        <animate attributeName="cx" values="{x1:.1f};{x2:.1f}" dur="{duration:.1f}s" begin="{begin:.1f}s" repeatCount="indefinite" />
+        <animate attributeName="cy" values="{y1:.1f};{y2:.1f}" dur="{duration:.1f}s" begin="{begin:.1f}s" repeatCount="indefinite" />
+        <animate attributeName="fill-opacity" values="0;0.84;0" dur="{duration:.1f}s" begin="{begin:.1f}s" repeatCount="indefinite" />
       </circle>"""
         )
 
-    return "\n".join(particles)
-
-
-def build_ambient_particles(palette: Palette, rng: random.Random) -> str:
-    particles: list[str] = []
-
-    for index in range(28):
-        x = rng.uniform(24, WIDTH - 24)
-        y = rng.uniform(36, HEIGHT - 36)
-        drift_x = x + rng.uniform(-45, 45)
-        drift_y = y + rng.uniform(-34, 34)
-        radius = rng.uniform(1.0, 2.4)
-        duration = rng.uniform(12, 24)
-        begin = rng.uniform(0, 6)
-        opacity = rng.uniform(0.14, 0.36)
-        particles.append(
+    for index in range(10):
+        x = rng.uniform(90, WIDTH - 90)
+        y = rng.uniform(80, HEIGHT - 80)
+        pulses.append(
             f"""
-      <circle cx="{x:.2f}" cy="{y:.2f}" r="{radius:.2f}" fill="{palette.accent}" opacity="{opacity:.2f}">
-        <animate attributeName="cx" values="{x:.2f};{drift_x:.2f};{x:.2f}" dur="{duration:.1f}s" begin="{begin:.2f}s" repeatCount="indefinite" />
-        <animate attributeName="cy" values="{y:.2f};{drift_y:.2f};{y:.2f}" dur="{duration + 4:.1f}s" begin="{begin:.2f}s" repeatCount="indefinite" />
+      <circle cx="{x:.2f}" cy="{y:.2f}" r="{rng.uniform(1.1, 2.0):.2f}" fill="{palette.secondary}" fill-opacity="{rng.uniform(0.10, 0.26):.2f}">
+        <animate attributeName="fill-opacity" values="0.04;0.28;0.04" dur="{rng.uniform(8, 16):.1f}s" begin="{rng.uniform(0, 5):.1f}s" repeatCount="indefinite" />
       </circle>"""
         )
 
-    return "\n".join(particles)
+    return "\n".join(pulses)
+
+
+def build_signature_nodes(palette: Palette, rng: random.Random) -> str:
+    raw_points = text_points("JAKE", 6.2)[::4]
+    xs = [point[0] for point in raw_points]
+    ys = [point[1] for point in raw_points]
+    center_x = WIDTH / 2
+    center_y = HEIGHT / 2 - 8
+    scale = min(154 / (max(xs) - min(xs)), 30 / (max(ys) - min(ys)))
+    mapped: list[tuple[float, float]] = []
+
+    for x, y in raw_points:
+        nx = center_x + (x - (min(xs) + max(xs)) / 2) * scale
+        ny = center_y + (y - (min(ys) + max(ys)) / 2) * scale
+        mapped.append((nx, ny))
+
+    traces: list[str] = []
+    ordered = sorted(mapped, key=lambda point: (round(point[1] / 6), point[0]))
+
+    for index in range(len(ordered) - 1):
+        if index % 2 == 1:
+            continue
+        x1, y1 = ordered[index]
+        x2, y2 = ordered[index + 1]
+        bend_x = (x1 + x2) / 2 + rng.uniform(-6, 6)
+        traces.append(
+            f"""
+      <path d="M {x1:.2f} {y1:.2f} L {bend_x:.2f} {y1:.2f} L {bend_x:.2f} {y2:.2f} L {x2:.2f} {y2:.2f}"
+            stroke="{palette.secondary}" stroke-width="0.7" stroke-opacity="0.07" fill="none">
+        <animate attributeName="stroke-opacity" values="0.02;0.09;0.02" dur="{11 + index * 0.3:.1f}s" begin="{index * 0.2:.1f}s" repeatCount="indefinite" />
+      </path>"""
+        )
+
+    nodes = [
+        f"""
+      <rect x="{x - 1.3:.2f}" y="{y - 1.3:.2f}" width="2.6" height="2.6" rx="0.6"
+            fill="{palette.particle}" fill-opacity="0.05" stroke="{palette.label}" stroke-width="0.5" stroke-opacity="0.08">
+        <animate attributeName="fill-opacity" values="0.02;0.08;0.02" dur="{9 + (index % 8) * 0.9:.1f}s" begin="{index * 0.15:.1f}s" repeatCount="indefinite" />
+      </rect>"""
+        for index, (x, y) in enumerate(mapped)
+    ]
+
+    return f"""
+    <g transform="rotate(-9 {center_x} {center_y})">
+{''.join(traces)}
+{''.join(nodes)}
+    </g>"""
 
 
 def render_svg(theme: str, moment: datetime) -> str:
     palette = choose_palette(theme, moment)
     rng = random.Random(build_seed(moment, theme))
-    targets = text_points("JAKE", 13.5)
     contours = build_contours(palette, rng)
     haze = build_haze(palette, rng)
-    text_particle_layer = build_text_particles(targets, palette, rng)
-    ambient_particles = build_ambient_particles(palette, rng)
-    connectors = build_connector_lines(targets, palette, rng)
-    orbit_left = build_orbit_group(188, 130, 56, palette, 32, reverse=False)
-    orbit_right = build_orbit_group(772, 292, 72, palette, 44, reverse=True)
+    panel_grid = build_panel_grid(palette)
+    brackets = build_corner_brackets(palette)
+    core = build_mechanical_core(palette)
+    module_left = build_aux_module(188, HEIGHT / 2 + 2, 42, palette, 19, reverse=False)
+    module_right = build_aux_module(772, HEIGHT / 2 + 2, 54, palette, 23, reverse=True)
+    signal_bus = build_signal_bus(palette)
+    pulses = build_probe_pulses(palette, rng)
+    signature_nodes = build_signature_nodes(palette, rng)
     label = moment.strftime("%Y.%m.%d %H:%M UTC")
 
     return f"""<svg width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Ambient profile installation</title>
-  <desc id="desc">Animated contour lines, orbiting rings, and drifting particles that briefly assemble into the name JAKE.</desc>
+  <title id="title">Mechanical signal installation</title>
+  <desc id="desc">Animated instrument-like artwork with rings, rails, gauges, and a faint embedded signature lattice.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="{WIDTH}" y2="{HEIGHT}" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="{palette.background_start}" />
@@ -270,10 +451,10 @@ def render_svg(theme: str, moment: datetime) -> str:
       <stop offset="100%" stop-color="{palette.contour}" stop-opacity="0.10" />
     </linearGradient>
     <filter id="blur" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="28" />
+      <feGaussianBlur stdDeviation="20" />
     </filter>
     <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="5" result="blurred" />
+      <feGaussianBlur stdDeviation="4" result="blurred" />
       <feMerge>
         <feMergeNode in="blurred" />
         <feMergeNode in="SourceGraphic" />
@@ -289,25 +470,31 @@ def render_svg(theme: str, moment: datetime) -> str:
   </g>
 
   <g>
-{contours}
-  </g>
-
-  <g opacity="0.75">
-    {orbit_left}
-    {orbit_right}
-  </g>
-
-  <g filter="url(#softGlow)">
-{connectors}
-{text_particle_layer}
+{panel_grid}
+{brackets}
   </g>
 
   <g>
-{ambient_particles}
+{contours}
+  </g>
+
+  <g opacity="0.86">
+    {signal_bus}
+    {module_left}
+    {module_right}
+    {core}
+  </g>
+
+  <g filter="url(#softGlow)">
+    {signature_nodes}
+  </g>
+
+  <g>
+    {pulses}
   </g>
 
   <text x="40" y="{HEIGHT - 30}" fill="{palette.label}" fill-opacity="0.70"
-        font-family="'Segoe UI', 'Noto Sans', sans-serif" font-size="13" letter-spacing="0.28em">AMBIENT INSTALLATION</text>
+        font-family="'Segoe UI', 'Noto Sans', sans-serif" font-size="13" letter-spacing="0.28em">KINETIC SIGNAL APPARATUS</text>
   <text x="{WIDTH - 192}" y="{HEIGHT - 30}" fill="{palette.label}" fill-opacity="0.42"
         font-family="'Segoe UI', 'Noto Sans', sans-serif" font-size="11" text-anchor="start" letter-spacing="0.18em">{label}</text>
 </svg>
