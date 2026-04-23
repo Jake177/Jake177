@@ -7,117 +7,101 @@ from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
 import random
+from PIL import Image
 
 WIDTH = 960
 HEIGHT = 420
-CYCLE = 32
-FRAME_ORDER = ("idle", "blink", "meow", "play", "hop", "sleep")
-FRAME_TIMES = [0, 6, 10, 16, 22, 26, 32]
-KEY_TIMES = ";".join(f"{point / CYCLE:.6f}".rstrip("0").rstrip(".") for point in FRAME_TIMES)
-SPRITE_WIDTH = 20
-SPRITE_HEIGHT = 18
-SPRITE_SCALE = 10
-
-Cell = tuple[int, int]
+SCALE = 10
+GRID_WIDTH = WIDTH // SCALE
+GRID_HEIGHT = HEIGHT // SCALE
+DIST_DIR = Path("dist")
 
 
 @dataclass(frozen=True)
 class ScenePalette:
-    background_start: str
-    background_end: str
-    glow: str
-    shadow: str
-    shadow_soft: str
-    floor: str
-    bubble_fill: str
-    bubble_text: str
+    background: str
+    halo: str
+    cat_shadow: str
+    platform_shadow: str
+    platform: str
+    sparkle: str
 
 
 @dataclass(frozen=True)
 class FurPalette:
     outline: str
     fill: str
-    shadow: str
+    shade: str
     ear: str
     blush: str
     nose: str
+    mouth: str
+    yarn: str
+    yarn_shade: str
 
 
 @dataclass(frozen=True)
 class Variant:
-    cat_x: int
-    cat_y: int
-    glow_dx: int
-    glow_dy: int
-    ball_dx: int
     fur_index: int
     scene_index: int
+    cat_dx: int
+    yarn_dx: int
+    halo_dx: int
+    facing: int
+
+
+@dataclass(frozen=True)
+class FrameSpec:
+    name: str
+    duration_ms: int
+    cat_dy: int = 0
+    head_dy: int = 0
+    body_dy: int = 0
+    eyes: str = "open"
+    mouth: str = "smile"
+    tail: str = "curl"
+    paw: str = "rest"
+    yarn_dx: int = 0
+    yarn_dy: int = 0
+    sleep_marks: int = 0
 
 
 LIGHT_SCENES = [
-    ScenePalette("#f4f3f2", "#dedfe6", "#ebe7e1", "#c7ccd4", "#d5d9df", "#aeb4be", "#fcfcfc", "#111111"),
-    ScenePalette("#f2f1ef", "#dbe1e8", "#ebe2da", "#c8ccd3", "#d8dce1", "#adb2bc", "#fbfbfb", "#101010"),
-    ScenePalette("#f1efec", "#dde2e7", "#e7e1db", "#c7ccd1", "#d3d9de", "#b0b5bd", "#fbfbfb", "#111111"),
+    ScenePalette("#efede8", "#f7f4ef", "#cdc7bf", "#d6d0c9", "#c1bbb3", "#ffffff"),
+    ScenePalette("#ece9e3", "#f5f1ea", "#ccc5bd", "#d4cec6", "#beb8af", "#ffffff"),
+    ScenePalette("#f0ece7", "#f7f3ed", "#cec8c0", "#d8d2ca", "#c3bdb5", "#ffffff"),
 ]
 
 DARK_SCENES = [
-    ScenePalette("#1a2430", "#242f3d", "#2c3948", "#0e141b", "#18202a", "#5f6873", "#f0f1f3", "#111111"),
-    ScenePalette("#18222d", "#24303a", "#2b3844", "#10161d", "#172029", "#5d6771", "#eeeff2", "#111111"),
-    ScenePalette("#19212b", "#252d39", "#303b46", "#0f151d", "#18212a", "#606973", "#f1f2f4", "#111111"),
+    ScenePalette("#18212b", "#273241", "#10161d", "#1f2b39", "#435163", "#dce3ea"),
+    ScenePalette("#17202a", "#293543", "#11161d", "#202b37", "#455465", "#dfe5eb"),
+    ScenePalette("#19232c", "#2b3640", "#10171e", "#202c38", "#45505e", "#e0e6eb"),
 ]
 
 FUR_PALETTES = [
-    FurPalette("#111111", "#9e9e9e", "#6d6d6d", "#676767", "#e8a6bd", "#111111"),
-    FurPalette("#111111", "#d9c49b", "#b3956d", "#caa780", "#e8a6bd", "#111111"),
-    FurPalette("#111111", "#d48d66", "#b76b46", "#d9a37e", "#e8a6bd", "#111111"),
-    FurPalette("#111111", "#cfcfd1", "#9b9ba0", "#b8b8bb", "#e8a6bd", "#111111"),
+    FurPalette("#111111", "#9f9f9f", "#6c6c6c", "#7b7b7b", "#e8a9c0", "#f0c6c7", "#6b3941", "#c14e53", "#8b363b"),
+    FurPalette("#111111", "#cfcfd1", "#999ca2", "#b4b6bc", "#e8a9c0", "#f0c6c7", "#6b3941", "#a26ad6", "#7245a3"),
+    FurPalette("#111111", "#e0bf94", "#b58f67", "#c8a37d", "#e8a9c0", "#f0c6c7", "#6b3941", "#d58e4d", "#9d6434"),
 ]
 
-BODY_ART = (
-    ".......A....A.......",
-    "......ACA..ACA......",
-    ".....AAAAAAAAAA.....",
-    "....AAAAAAAAAAAA....",
-    "....AAAAAAAAAAAA....",
-    "....AAAAAAAAAAAA....",
-    "....AAAAAAAAAAAA....",
-    "....AAAAAAAAAAAA....",
-    "...AAAAAAAAAAAAAA...",
-    "...AAASAAAAASAAAA...",
-    "...AAAAAAAAAAAAAA...",
-    "...AAAAAAAAAAAAAAT..",
-    "...AAAAAAAAAAAAAATT.",
-    "...AAAAAAAAAAAAAATT.",
-    "....AAAAA..AAAAATT..",
-    "....AAAAA..AAAAATT..",
-    ".....AAA....AAATT...",
-    ".............TT.....",
-)
+FRAME_SPECS = [
+    FrameSpec("idle-1", 420, tail="curl"),
+    FrameSpec("idle-2", 320, cat_dy=1, head_dy=1, body_dy=1, tail="sway"),
+    FrameSpec("blink", 170, tail="sway", eyes="blink"),
+    FrameSpec("idle-3", 320, tail="curl"),
+    FrameSpec("yawn-1", 240, head_dy=-1, tail="perk", eyes="soft", mouth="small-open"),
+    FrameSpec("yawn-2", 420, head_dy=-2, tail="perk", eyes="soft", mouth="wide-open"),
+    FrameSpec("play-1", 240, tail="high", paw="bat", yarn_dx=-2, yarn_dy=-1),
+    FrameSpec("play-2", 240, cat_dy=-1, tail="high", paw="bat-2", yarn_dx=3, yarn_dy=-2),
+    FrameSpec("jump", 220, cat_dy=-4, head_dy=-1, body_dy=-1, tail="high", eyes="open", mouth="smile", paw="tuck"),
+    FrameSpec("land", 230, cat_dy=-1, head_dy=1, body_dy=1, tail="sway", eyes="blink", mouth="smile"),
+    FrameSpec("sleep-1", 620, cat_dy=1, head_dy=1, body_dy=1, tail="rest", eyes="sleep", mouth="tiny", sleep_marks=1),
+    FrameSpec("sleep-2", 680, cat_dy=2, head_dy=2, body_dy=2, tail="rest", eyes="sleep", mouth="tiny", sleep_marks=2),
+]
 
 GLYPHS = {
-    "M": ("10001", "11011", "10101", "10001", "10001"),
-    "E": ("11111", "10000", "11110", "10000", "11111"),
-    "O": ("01110", "10001", "10001", "10001", "01110"),
-    "W": ("10001", "10001", "10101", "11011", "10001"),
-    "!": ("1", "1", "1", "0", "1"),
-    "Z": ("11111", "00010", "00100", "01000", "11111"),
-    ".": ("0", "0", "0", "0", "1"),
-    " ": ("0", "0", "0", "0", "0"),
+    "Z": ("111", "001", "010", "100", "111"),
 }
-
-BUBBLE_TEXT = {
-    "idle": "...",
-    "blink": "...",
-    "meow": "MEOW!",
-    "play": "MEOW!",
-    "hop": "!",
-    "sleep": "ZZZ",
-}
-
-CAT_TRANSLATE_VALUES = "0 0;0 0;0 -4;0 -2;0 -20;0 -2;0 0"
-BUBBLE_TRANSLATE_VALUES = "0 0;0 0;0 -2;0 -1;0 -8;0 -1;0 0"
-BALL_TRANSLATE_VALUES = "0 0;0 0;0 0;8 -4;4 -2;0 0;0 0"
-BALL_ROTATE_VALUES = "0 0 0;0 0 0;0 0 0;120 0 0;240 0 0;360 0 0;360 0 0"
 
 
 def slot_time(moment: datetime) -> datetime:
@@ -131,30 +115,60 @@ def build_seed(moment: datetime) -> int:
 def choose_variant(moment: datetime) -> Variant:
     rng = random.Random(build_seed(moment))
     return Variant(
-        cat_x=378 + rng.randrange(-16, 17, 8),
-        cat_y=146 + rng.randrange(-8, 9, 8),
-        glow_dx=rng.randrange(-40, 41, 8),
-        glow_dy=rng.randrange(-24, 25, 8),
-        ball_dx=rng.randrange(-8, 17, 8),
         fur_index=rng.randrange(len(FUR_PALETTES)),
         scene_index=rng.randrange(3),
+        cat_dx=rng.randrange(-2, 3),
+        yarn_dx=rng.randrange(-3, 4),
+        halo_dx=rng.randrange(-4, 5),
+        facing=1 if rng.random() >= 0.5 else -1,
     )
 
 
-def fmt(value: float) -> str:
-    if abs(value - round(value)) < 1e-6:
-        return str(int(round(value)))
-    return f"{value:.3f}".rstrip("0").rstrip(".")
+def hex_to_rgb(color: str) -> tuple[int, int, int]:
+    color = color.lstrip("#")
+    return int(color[0:2], 16), int(color[2:4], 16), int(color[4:6], 16)
 
 
-def add_rect(cells: set[Cell], x: int, y: int, width: int, height: int) -> None:
-    for iy in range(y, y + height):
-        for ix in range(x, x + width):
-            cells.add((ix, iy))
+def ellipse_cells(cx: int, cy: int, rx: int, ry: int) -> set[tuple[int, int]]:
+    cells: set[tuple[int, int]] = set()
+    for y in range(cy - ry, cy + ry + 1):
+        for x in range(cx - rx, cx + rx + 1):
+            dx = x - cx
+            dy = y - cy
+            if (dx * dx) * (ry * ry) + (dy * dy) * (rx * rx) <= (rx * rx) * (ry * ry):
+                cells.add((x, y))
+    return cells
 
 
-def outline_cells(cells: set[Cell]) -> set[Cell]:
-    outline: set[Cell] = set()
+def rect_cells(x: int, y: int, width: int, height: int) -> set[tuple[int, int]]:
+    return {(ix, iy) for iy in range(y, y + height) for ix in range(x, x + width)}
+
+
+def triangle_cells(points: list[tuple[int, int]]) -> set[tuple[int, int]]:
+    (x1, y1), (x2, y2), (x3, y3) = points
+    min_x = min(x1, x2, x3)
+    max_x = max(x1, x2, x3)
+    min_y = min(y1, y2, y3)
+    max_y = max(y1, y2, y3)
+    cells: set[tuple[int, int]] = set()
+
+    def sign(px: int, py: int, ax: int, ay: int, bx: int, by: int) -> int:
+        return (px - bx) * (ay - by) - (ax - bx) * (py - by)
+
+    for y in range(min_y, max_y + 1):
+        for x in range(min_x, max_x + 1):
+            center_x = x * 2 + 1
+            center_y = y * 2 + 1
+            b1 = sign(center_x, center_y, x1 * 2, y1 * 2, x2 * 2, y2 * 2) < 0
+            b2 = sign(center_x, center_y, x2 * 2, y2 * 2, x3 * 2, y3 * 2) < 0
+            b3 = sign(center_x, center_y, x3 * 2, y3 * 2, x1 * 2, y1 * 2) < 0
+            if b1 == b2 == b3:
+                cells.add((x, y))
+    return cells
+
+
+def outline_cells(cells: set[tuple[int, int]]) -> set[tuple[int, int]]:
+    outline: set[tuple[int, int]] = set()
     for x, y in cells:
         for dx in (-1, 0, 1):
             for dy in (-1, 0, 1):
@@ -165,284 +179,287 @@ def outline_cells(cells: set[Cell]) -> set[Cell]:
     return outline
 
 
-def render_cells(cells: set[Cell], color: str) -> str:
-    if not cells:
-        return ""
+def mirror_cells(cells: set[tuple[int, int]], facing: int) -> set[tuple[int, int]]:
+    if facing == 1:
+        return set(cells)
+    return {(-x, y) for x, y in cells}
 
-    rows: dict[int, list[int]] = {}
+
+def shift_cells(cells: set[tuple[int, int]], dx: int, dy: int) -> set[tuple[int, int]]:
+    return {(x + dx, y + dy) for x, y in cells}
+
+
+def new_canvas(fill_index: int) -> list[list[int]]:
+    return [[fill_index for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
+
+
+def paint_cells(canvas: list[list[int]], cells: set[tuple[int, int]], color_index: int) -> None:
     for x, y in cells:
-        rows.setdefault(y, []).append(x)
-
-    rects: list[str] = []
-    for y in sorted(rows):
-        xs = sorted(rows[y])
-        start = xs[0]
-        prev = xs[0]
-        for x in xs[1:]:
-            if x == prev + 1:
-                prev = x
-                continue
-            rects.append(
-                f'<rect x="{start}" y="{y}" width="{prev - start + 1}" height="1" fill="{color}" />'
-            )
-            start = prev = x
-        rects.append(
-            f'<rect x="{start}" y="{y}" width="{prev - start + 1}" height="1" fill="{color}" />'
-        )
-    return "\n        ".join(rects)
+        if 0 <= x < GRID_WIDTH and 0 <= y < GRID_HEIGHT:
+            canvas[y][x] = color_index
 
 
-def frame_opacity(mode: str) -> str:
-    values = ["0"] * len(FRAME_ORDER)
-    values[FRAME_ORDER.index(mode)] = "1"
-    values.append(values[0])
-    return ";".join(values)
+def paint_ellipse(canvas: list[list[int]], cx: int, cy: int, rx: int, ry: int, color_index: int) -> None:
+    paint_cells(canvas, ellipse_cells(cx, cy, rx, ry), color_index)
 
 
-def parse_body_art() -> dict[str, set[Cell]]:
-    layers = {
-        "base": set(),
-        "shadow": set(),
-        "ear": set(),
-        "stripe": set(),
+def draw_glyph(
+    canvas: list[list[int]],
+    origin_x: int,
+    origin_y: int,
+    glyph: str,
+    color_index: int,
+) -> None:
+    rows = GLYPHS[glyph]
+    for y, row in enumerate(rows):
+        for x, char in enumerate(row):
+            if char == "1":
+                if 0 <= origin_x + x < GRID_WIDTH and 0 <= origin_y + y < GRID_HEIGHT:
+                    canvas[origin_y + y][origin_x + x] = color_index
+
+
+def cat_layers(spec: FrameSpec, variant: Variant) -> dict[str, set[tuple[int, int]]]:
+    facing = variant.facing
+    head_cy = -5 + spec.head_dy
+    body_cy = 4 + spec.body_dy
+
+    fur = ellipse_cells(0, head_cy, 9, 6)
+    fur |= ellipse_cells(0, body_cy, 11, 8)
+    fur |= rect_cells(-7, 10 + spec.body_dy, 4, 4)
+    fur |= rect_cells(3, 10 + spec.body_dy, 4, 4)
+    fur |= rect_cells(-9, -7 + spec.head_dy, 2, 3)
+    fur |= rect_cells(7, -7 + spec.head_dy, 2, 3)
+    fur |= triangle_cells([(-8, -10 + spec.head_dy), (-5, -16 + spec.head_dy), (-2, -10 + spec.head_dy)])
+    fur |= triangle_cells([(8, -10 + spec.head_dy), (5, -16 + spec.head_dy), (2, -10 + spec.head_dy)])
+
+    if spec.paw == "bat":
+        fur |= rect_cells(7, 7 + spec.body_dy, 4, 2)
+    elif spec.paw == "bat-2":
+        fur |= rect_cells(8, 6 + spec.body_dy, 4, 2)
+    elif spec.paw == "tuck":
+        fur -= rect_cells(-7, 11 + spec.body_dy, 4, 3)
+        fur -= rect_cells(3, 11 + spec.body_dy, 4, 3)
+        fur |= rect_cells(-6, 9 + spec.body_dy, 3, 3)
+        fur |= rect_cells(3, 9 + spec.body_dy, 3, 3)
+
+    if spec.tail == "curl":
+        tail_blocks = [(12, 9), (13, 8), (14, 7), (14, 5), (13, 3), (12, 2)]
+    elif spec.tail == "sway":
+        tail_blocks = [(12, 8), (13, 7), (14, 6), (15, 5), (14, 3)]
+    elif spec.tail == "perk":
+        tail_blocks = [(11, 8), (12, 6), (13, 4), (13, 2), (12, 0)]
+    elif spec.tail == "high":
+        tail_blocks = [(11, 7), (12, 5), (13, 3), (13, 1), (12, -1)]
+    else:
+        tail_blocks = [(11, 10), (12, 10), (13, 9), (14, 8), (14, 7)]
+
+    tail: set[tuple[int, int]] = set()
+    for block_x, block_y in tail_blocks:
+        tail |= rect_cells(block_x, block_y + spec.body_dy, 2, 2)
+    fur |= mirror_cells(tail, facing)
+
+    ear = triangle_cells([(-6, -10 + spec.head_dy), (-5, -14 + spec.head_dy), (-3, -10 + spec.head_dy)])
+    ear |= triangle_cells([(6, -10 + spec.head_dy), (5, -14 + spec.head_dy), (3, -10 + spec.head_dy)])
+
+    shade = rect_cells(-9, -2 + spec.body_dy, 2, 6)
+    shade |= rect_cells(7, -2 + spec.body_dy, 2, 6)
+    shade |= rect_cells(-7, 4 + spec.body_dy, 2, 5)
+    shade |= rect_cells(5, 4 + spec.body_dy, 2, 5)
+    shade |= rect_cells(-7, 11 + spec.body_dy, 2, 3)
+    shade |= rect_cells(5, 11 + spec.body_dy, 2, 3)
+    shade |= rect_cells(-7, -7 + spec.head_dy, 2, 3)
+    shade |= rect_cells(5, -7 + spec.head_dy, 2, 3)
+    shade |= mirror_cells(rect_cells(12, 5 + spec.body_dy, 2, 2), facing)
+
+    blush = {(-6, -4 + spec.head_dy), (-5, -4 + spec.head_dy), (5, -4 + spec.head_dy), (6, -4 + spec.head_dy)}
+
+    nose = {(0, -3 + spec.head_dy)}
+    if spec.mouth == "wide-open":
+        nose |= {(0, -4 + spec.head_dy)}
+
+    features: set[tuple[int, int]] = set()
+    mouth: set[tuple[int, int]] = set()
+
+    if spec.eyes == "open":
+        features |= {(-4, -5 + spec.head_dy), (-4, -4 + spec.head_dy), (4, -5 + spec.head_dy), (4, -4 + spec.head_dy)}
+    elif spec.eyes == "blink":
+        features |= {(-5, -4 + spec.head_dy), (-4, -4 + spec.head_dy), (4, -4 + spec.head_dy), (5, -4 + spec.head_dy)}
+    elif spec.eyes == "soft":
+        features |= {(-5, -5 + spec.head_dy), (-4, -5 + spec.head_dy), (4, -5 + spec.head_dy), (5, -5 + spec.head_dy)}
+    else:
+        features |= {(-5, -4 + spec.head_dy), (-4, -4 + spec.head_dy), (4, -4 + spec.head_dy), (5, -4 + spec.head_dy)}
+
+    if spec.mouth == "smile":
+        mouth |= {(-1, -2 + spec.head_dy), (0, -1 + spec.head_dy), (1, -2 + spec.head_dy)}
+    elif spec.mouth == "small-open":
+        mouth |= {(-1, -2 + spec.head_dy), (0, -1 + spec.head_dy), (1, -2 + spec.head_dy), (0, 0 + spec.head_dy)}
+    elif spec.mouth == "wide-open":
+        mouth |= {(-1, -2 + spec.head_dy), (0, -2 + spec.head_dy), (1, -2 + spec.head_dy), (-1, -1 + spec.head_dy), (1, -1 + spec.head_dy), (0, 0 + spec.head_dy)}
+    else:
+        mouth |= {(0, -1 + spec.head_dy)}
+
+    silhouette = fur | ear
+    outline = outline_cells(silhouette)
+
+    origin_x = 48 + variant.cat_dx
+    origin_y = 23 + spec.cat_dy
+
+    return {
+        "outline": shift_cells(outline, origin_x, origin_y),
+        "fur": shift_cells(fur, origin_x, origin_y),
+        "shade": shift_cells(shade & fur, origin_x, origin_y),
+        "ear": shift_cells(ear & fur, origin_x, origin_y),
+        "blush": shift_cells(blush, origin_x, origin_y),
+        "nose": shift_cells(nose, origin_x, origin_y),
+        "features": shift_cells(features, origin_x, origin_y),
+        "mouth": shift_cells(mouth, origin_x, origin_y),
     }
 
-    for y, row in enumerate(BODY_ART):
-        if len(row) != SPRITE_WIDTH:
-            raise ValueError(f"body art row has width {len(row)}, expected {SPRITE_WIDTH}")
-        for x, char in enumerate(row):
-            if char == ".":
-                continue
-            layers["base"].add((x, y))
-            if char == "S":
-                layers["shadow"].add((x, y))
-            elif char == "C":
-                layers["ear"].add((x, y))
-            elif char == "T":
-                layers["stripe"].add((x, y))
-    return layers
+
+def yarn_layers(spec: FrameSpec, variant: Variant) -> dict[str, set[tuple[int, int]]]:
+    base_x = 48 + variant.cat_dx + variant.facing * (19 + variant.yarn_dx) + spec.yarn_dx
+    base_y = 31 + spec.yarn_dy
+    yarn = ellipse_cells(base_x, base_y, 3, 3)
+    yarn |= rect_cells(base_x - 1, base_y - 1, 3, 2)
+    outline = outline_cells(yarn)
+    accent = {(base_x - 1, base_y), (base_x, base_y - 1), (base_x + 1, base_y + 1), (base_x, base_y + 2)}
+    return {"outline": outline, "fill": yarn, "accent": accent & yarn}
 
 
-BODY_LAYERS = parse_body_art()
-BODY_OUTLINE = outline_cells(BODY_LAYERS["base"])
+def build_theme(scene: ScenePalette, fur: FurPalette) -> tuple[list[str], dict[str, int]]:
+    colors = [
+        scene.background,
+        scene.halo,
+        scene.cat_shadow,
+        scene.platform_shadow,
+        scene.platform,
+        scene.sparkle,
+        fur.outline,
+        fur.fill,
+        fur.shade,
+        fur.ear,
+        fur.blush,
+        fur.nose,
+        fur.mouth,
+        fur.yarn,
+        fur.yarn_shade,
+    ]
+    palette: list[str] = []
+    seen: set[str] = set()
+    for color in colors:
+        if color not in seen:
+            palette.append(color)
+            seen.add(color)
+    return palette, {color: index for index, color in enumerate(palette)}
 
 
-def face_features(mode: str) -> dict[str, set[Cell]]:
-    face: set[Cell] = set()
-    nose: set[Cell] = {(9, 7)}
-    blush: set[Cell] = {(6, 7), (13, 7)}
+def render_logical_frame(
+    scene: ScenePalette,
+    fur: FurPalette,
+    variant: Variant,
+    spec: FrameSpec,
+    color_index: dict[str, int],
+) -> list[list[int]]:
+    canvas = new_canvas(color_index[scene.background])
 
-    if mode == "idle":
-        face.update({(8, 5), (11, 5), (8, 8), (11, 8), (9, 9), (10, 9)})
-    elif mode == "blink":
-        face.update({(7, 5), (8, 5), (11, 5), (12, 5), (8, 8), (11, 8)})
-    elif mode == "meow":
-        face.update({(8, 5), (11, 5), (9, 8), (10, 8), (9, 9), (10, 9)})
-        nose = {(9, 7), (10, 7)}
-        blush.update({(5, 7), (14, 7)})
-    elif mode == "play":
-        face.update({(7, 5), (8, 5), (11, 5), (8, 8), (9, 8), (11, 8)})
-        blush.update({(5, 7), (14, 7)})
-    elif mode == "hop":
-        face.update({(8, 5), (11, 5), (7, 6), (12, 6), (9, 8), (10, 8)})
-        nose = {(9, 7), (10, 7)}
-        blush.update({(5, 7), (14, 7)})
-    elif mode == "sleep":
-        face.update({(7, 5), (8, 5), (11, 5), (12, 5), (9, 8), (10, 8)})
-        blush = {(6, 7), (13, 7)}
+    paint_ellipse(canvas, 48 + variant.halo_dx, 18, 20, 12, color_index[scene.halo])
+    paint_ellipse(canvas, 48, 35, 22, 4, color_index[scene.platform_shadow])
+    paint_ellipse(canvas, 48, 33, 18, 3, color_index[scene.platform])
+    paint_ellipse(canvas, 48 + variant.cat_dx, 32 + spec.cat_dy, 12, 2, color_index[scene.cat_shadow])
 
-    return {"face": face, "nose": nose, "blush": blush}
+    yarn = yarn_layers(spec, variant)
+    paint_cells(canvas, yarn["outline"], color_index[fur.outline])
+    paint_cells(canvas, yarn["fill"], color_index[fur.yarn])
+    paint_cells(canvas, yarn["accent"], color_index[fur.yarn_shade])
 
+    cat = cat_layers(spec, variant)
+    paint_cells(canvas, cat["outline"], color_index[fur.outline])
+    paint_cells(canvas, cat["fur"], color_index[fur.fill])
+    paint_cells(canvas, cat["shade"], color_index[fur.shade])
+    paint_cells(canvas, cat["ear"], color_index[fur.ear])
+    paint_cells(canvas, cat["blush"], color_index[fur.blush])
+    paint_cells(canvas, cat["nose"], color_index[fur.nose])
+    paint_cells(canvas, cat["features"], color_index[fur.outline])
+    paint_cells(canvas, cat["mouth"], color_index[fur.mouth])
 
-def render_cat_frame(mode: str, fur: FurPalette) -> str:
-    features = face_features(mode)
-    return f"""
-      <g opacity="0">
-        <animate attributeName="opacity" values="{frame_opacity(mode)}"
-                 keyTimes="{KEY_TIMES}" dur="{CYCLE}s" repeatCount="indefinite" />
-        {render_cells(BODY_OUTLINE, fur.outline)}
-        {render_cells(BODY_LAYERS["base"], fur.fill)}
-        {render_cells(BODY_LAYERS["shadow"], fur.shadow)}
-        {render_cells(BODY_LAYERS["ear"], fur.ear)}
-        {render_cells(BODY_LAYERS["stripe"], fur.shadow)}
-        {render_cells(features["blush"], fur.blush)}
-        {render_cells(features["face"], fur.outline)}
-        {render_cells(features["nose"], fur.nose)}
-      </g>"""
+    for offset in range(spec.sleep_marks):
+        draw_glyph(canvas, 58 + offset * 4, 6 - offset * 3, "Z", color_index[scene.sparkle])
+
+    return canvas
 
 
-def glyph_cells(text: str) -> tuple[set[Cell], int]:
-    cells: set[Cell] = set()
-    cursor = 0
-
-    for index, char in enumerate(text):
-        glyph = GLYPHS[char]
-        width = len(glyph[0])
-        for y, row in enumerate(glyph):
-            for x, pixel in enumerate(row):
-                if pixel == "1":
-                    cells.add((cursor + x, y))
-        cursor += width
-        if index != len(text) - 1:
-            cursor += 1
-
-    return cells, cursor
+def image_from_logical_frame(logical_frame: list[list[int]], palette: list[str]) -> Image.Image:
+    image = Image.new("RGB", (GRID_WIDTH, GRID_HEIGHT))
+    pixels = image.load()
+    rgb_palette = [hex_to_rgb(color) for color in palette]
+    for y, row in enumerate(logical_frame):
+        for x, color_index in enumerate(row):
+            pixels[x, y] = rgb_palette[color_index]
+    return image.resize((WIDTH, HEIGHT), Image.Resampling.NEAREST)
 
 
-def bubble_shell_cells() -> tuple[set[Cell], set[Cell]]:
-    outline: set[Cell] = set()
-    fill: set[Cell] = set()
-    width = 32
-    height = 11
-
-    add_rect(fill, 2, 1, width - 4, height - 2)
-    add_rect(fill, 1, 2, width - 2, height - 4)
-
-    for x in range(2, width - 2):
-        outline.add((x, 0))
-        outline.add((x, height - 1))
-    for y in range(2, height - 2):
-        outline.add((0, y))
-        outline.add((width - 1, y))
-    outline.update(
-        {
-            (1, 1),
-            (width - 2, 1),
-            (1, height - 2),
-            (width - 2, height - 2),
-            (9, height - 1),
-            (10, height),
-            (11, height + 1),
-            (12, height + 2),
-            (12, height + 1),
-            (11, height),
-        }
+def write_animated_gif(
+    path: Path,
+    logical_frames: list[list[list[int]]],
+    durations_ms: list[int],
+    palette: list[str],
+) -> None:
+    frames = [image_from_logical_frame(frame, palette) for frame in logical_frames]
+    frames[0].save(
+        path,
+        save_all=True,
+        append_images=frames[1:],
+        duration=durations_ms,
+        loop=0,
+        disposal=2,
+        optimize=False,
     )
-    fill.update({(10, height - 1), (11, height), (11, height + 1)})
-    return outline, fill
 
 
-BUBBLE_OUTLINE, BUBBLE_FILL = bubble_shell_cells()
+def write_sprite_sheet(path: Path, logical_frames: list[list[list[int]]], palette: list[str]) -> None:
+    tile_scale = 5
+    frame_gap = 8
+    crop_x = 28
+    crop_y = 4
+    crop_width = 40
+    crop_height = 36
+    tile_width = crop_width * tile_scale
+    tile_height = crop_height * tile_scale
+    sheet_width = len(logical_frames) * (tile_width + frame_gap) - frame_gap
+    sheet = Image.new("RGB", (sheet_width, tile_height), hex_to_rgb(palette[0]))
+
+    for frame_index, frame in enumerate(logical_frames):
+        tile = image_from_logical_frame(frame, palette)
+        tile = tile.crop((crop_x * SCALE, crop_y * SCALE, (crop_x + crop_width) * SCALE, (crop_y + crop_height) * SCALE))
+        tile = tile.resize((tile_width, tile_height), Image.Resampling.NEAREST)
+        offset_x = frame_index * (tile_width + frame_gap)
+        sheet.paste(tile, (offset_x, 0))
+
+    sheet.save(path)
 
 
-def render_bubble(scene: ScenePalette, variant: Variant) -> str:
-    bubble_x = variant.cat_x + 28
-    bubble_y = 42
-    groups: list[str] = []
-
-    for mode in FRAME_ORDER:
-        text_cells, text_width = glyph_cells(BUBBLE_TEXT[mode])
-        offset_x = max(0, (32 - text_width) // 2)
-        shifted_text = {(x + offset_x, y + 3) for x, y in text_cells}
-        groups.append(
-            f"""
-      <g opacity="0">
-        <animate attributeName="opacity" values="{frame_opacity(mode)}"
-                 keyTimes="{KEY_TIMES}" dur="{CYCLE}s" repeatCount="indefinite" />
-        {render_cells(shifted_text, scene.bubble_text)}
-      </g>"""
-        )
-
-    return f"""
-  <g transform="translate({bubble_x} {bubble_y}) scale(4 4)" shape-rendering="crispEdges">
-    <animateTransform attributeName="transform" type="translate" values="{BUBBLE_TRANSLATE_VALUES}"
-                      keyTimes="{KEY_TIMES}" dur="{CYCLE}s" repeatCount="indefinite" additive="sum" />
-    {render_cells(BUBBLE_FILL, scene.bubble_fill)}
-    {render_cells(BUBBLE_OUTLINE, "#111111")}
-{''.join(groups)}
-  </g>"""
-
-
-def render_yarn(scene: ScenePalette, fur: FurPalette, variant: Variant) -> str:
-    outline: set[Cell] = set()
-    fill: set[Cell] = set()
-    string: set[Cell] = set()
-
-    add_rect(fill, 0, 0, 3, 3)
-    add_rect(fill, 1, -1, 1, 1)
-    add_rect(fill, 3, 1, 1, 1)
-    outline.update(outline_cells(fill))
-    add_rect(string, -4, 1, 4, 1)
-
-    x = variant.cat_x + 168 + variant.ball_dx
-    y = variant.cat_y + 114
-
-    return f"""
-  <g transform="translate({x} {y}) scale(6 6)" shape-rendering="crispEdges">
-    <animateTransform attributeName="transform" type="translate" values="{BALL_TRANSLATE_VALUES}"
-                      keyTimes="{KEY_TIMES}" dur="{CYCLE}s" repeatCount="indefinite" additive="sum" />
-    <g>
-      <animateTransform attributeName="transform" type="rotate" values="{BALL_ROTATE_VALUES}"
-                        keyTimes="{KEY_TIMES}" dur="{CYCLE}s" repeatCount="indefinite" />
-      {render_cells(outline | string, "#111111")}
-      {render_cells(fill, scene.floor)}
-      <rect x="1" y="1" width="1" height="1" fill="{fur.blush}" />
-    </g>
-  </g>"""
-
-
-def render_stage(scene: ScenePalette, variant: Variant) -> str:
-    center_x = variant.cat_x + SPRITE_WIDTH * SPRITE_SCALE / 2
-    center_y = variant.cat_y + SPRITE_HEIGHT * SPRITE_SCALE / 2
-    return f"""
-  <g>
-    <ellipse cx="{fmt(center_x + variant.glow_dx)}" cy="{fmt(center_y - 26 + variant.glow_dy)}" rx="172" ry="132"
-             fill="{scene.glow}" opacity="0.34" />
-    <ellipse cx="{fmt(center_x)}" cy="332" rx="176" ry="26" fill="{scene.shadow}" opacity="0.72" />
-    <ellipse cx="{fmt(center_x)}" cy="324" rx="134" ry="18" fill="{scene.shadow_soft}" opacity="0.86" />
-    <rect x="{fmt(center_x - 184)}" y="314" width="368" height="6" fill="{scene.floor}" opacity="0.56" />
-  </g>"""
-
-
-def render_cat(fur: FurPalette, variant: Variant) -> str:
-    frames = "\n".join(render_cat_frame(mode, fur) for mode in FRAME_ORDER)
-    return f"""
-  <g transform="translate({variant.cat_x} {variant.cat_y}) scale({SPRITE_SCALE} {SPRITE_SCALE})"
-     shape-rendering="crispEdges">
-    <animateTransform attributeName="transform" type="translate" values="{CAT_TRANSLATE_VALUES}"
-                      keyTimes="{KEY_TIMES}" dur="{CYCLE}s" repeatCount="indefinite" additive="sum" />
-{frames}
-  </g>"""
-
-
-def render_svg(theme: str, moment: datetime) -> str:
+def generate_assets(theme: str, moment: datetime, output_name: str) -> None:
     variant = choose_variant(moment)
     scene = (DARK_SCENES if theme == "dark" else LIGHT_SCENES)[variant.scene_index]
     fur = FUR_PALETTES[variant.fur_index]
+    palette, color_index = build_theme(scene, fur)
 
-    return f"""<svg width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Animated pixel mascot cat artwork</title>
-  <desc id="desc">A chibi pixel cat with a speech bubble blinks, meows, bounces, and dozes on a soft background.</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="{WIDTH}" y2="{HEIGHT}" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="{scene.background_start}" />
-      <stop offset="100%" stop-color="{scene.background_end}" />
-    </linearGradient>
-  </defs>
+    logical_frames = [render_logical_frame(scene, fur, variant, spec, color_index) for spec in FRAME_SPECS]
+    durations = [spec.duration_ms for spec in FRAME_SPECS]
 
-  <rect width="{WIDTH}" height="{HEIGHT}" rx="28" fill="url(#bg)" />
-{render_stage(scene, variant)}
-{render_bubble(scene, variant)}
-{render_cat(fur, variant)}
-{render_yarn(scene, fur, variant)}
-</svg>
-"""
+    write_animated_gif(DIST_DIR / f"{output_name}.gif", logical_frames, durations, palette)
+    write_sprite_sheet(DIST_DIR / f"{output_name}-sheet.png", logical_frames, palette)
 
 
 def main() -> None:
-    output_dir = Path("dist")
-    output_dir.mkdir(parents=True, exist_ok=True)
-    for stale_svg in output_dir.glob("*.svg"):
-        stale_svg.unlink()
+    DIST_DIR.mkdir(exist_ok=True)
+    for path in DIST_DIR.glob("*"):
+        if path.is_file():
+            path.unlink()
 
     moment = slot_time(datetime.now(timezone.utc))
-    outputs = {
-        "profile-cat.svg": render_svg("light", moment),
-        "profile-cat-dark.svg": render_svg("dark", moment),
-    }
-
-    for name, content in outputs.items():
-        (output_dir / name).write_text(content, encoding="utf-8")
+    generate_assets("light", moment, "profile-cat")
+    generate_assets("dark", moment, "profile-cat-dark")
 
 
 if __name__ == "__main__":

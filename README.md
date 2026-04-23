@@ -1,9 +1,9 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat-dark.svg?v=20260423c">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat.svg?v=20260423c">
-  <img alt="Animated pixel mascot cat artwork" src="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat.svg?v=20260423c">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat-dark.gif?v=20260423gif1">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat.gif?v=20260423gif1">
+  <img alt="Animated pixel cat gif artwork" src="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat.gif?v=20260423gif1">
 </picture>
 
 </div>

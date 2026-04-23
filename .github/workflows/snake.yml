@@ -25,7 +25,10 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Generate pixel cat artwork
+      - name: Install dependencies
+        run: python3 -m pip install -r requirements.txt
+
+      - name: Generate pixel cat gif
         run: python3 scripts/generate_profile_cat.py
 
       - name: Push generated artwork to output branch
@@ -34,4 +37,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: output
-          commit_message: "Generate pixel cat artwork"
+          commit_message: "Generate pixel cat gif"
