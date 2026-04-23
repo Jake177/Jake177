@@ -1,222 +1,474 @@
 <svg width="960" height="420" viewBox="0 0 960 420" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Animated line-art cat resting on an abstract stage</title>
-  <desc id="desc">A calm profile cover where a minimalist cat sleeps, yawns, grooms, nudges a yarn ball, makes a small jump, and settles back into rest.</desc>
+  <title id="title">Animated pixel-art cat on a quiet stage</title>
+  <desc id="desc">A pixel-art cat sleeps, yawns, grooms, bats a yarn ball, makes a small hop, and settles back down.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="960" y2="420" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#f6f1ea" />
-      <stop offset="100%" stop-color="#dfeaf0" />
+      <stop offset="0%" stop-color="#f7f1e9" />
+      <stop offset="100%" stop-color="#dbe8ee" />
     </linearGradient>
-    <filter id="blur" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="26" />
-    </filter>
-    <style>
-      .stage-line {
-        fill: none;
-        stroke: #64747d;
-        stroke-width: 2;
-        stroke-linecap: round;
-      }
-      .frame-line {
-        fill: none;
-        stroke: #758791;
-        stroke-opacity: 0.28;
-        stroke-width: 1.8;
-        stroke-linecap: round;
-      }
-      .frame-line.soft {
-        stroke-opacity: 0.14;
-      }
-      .cat-line {
-        fill: none;
-        stroke: #28363d;
-        stroke-width: 3.4;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .cat-line.soft {
-        stroke-width: 2.4;
-        stroke: #758791;
-        stroke-opacity: 0.88;
-      }
-      .face-line {
-        fill: none;
-        stroke: #28363d;
-        stroke-width: 2.4;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .whisker-line {
-        fill: none;
-        stroke: #758791;
-        stroke-width: 1.8;
-        stroke-linecap: round;
-      }
-      .tail-line {
-        fill: none;
-        stroke: #28363d;
-        stroke-width: 10;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-      .tail-tip {
-        fill: none;
-        stroke: #d06d54;
-        stroke-width: 3.2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        opacity: 0.64;
-      }
-    </style>
   </defs>
 
   <rect width="960" height="420" rx="28" fill="url(#bg)" />
 
-
-  <g filter="url(#blur)">
-    <ellipse cx="466.156" cy="214.445" rx="172" ry="112"
-             fill="#eadbcc" opacity="0.28" />
-
-  </g>
-
   <g>
-    <ellipse cx="476.198" cy="330" rx="244" ry="36" fill="#a7b6bd" opacity="0.46" />
-    <path d="M 170 312 C 284 295.639 676 312.361 790 312"
-          class="stage-line" />
-    <path d="M 242.515 302 Q 476.198 147.36 709.882 302"
-          class="frame-line" />
-    <path d="M 266.515 302 Q 476.198 171.36 685.882 302"
-          class="frame-line soft" />
-    <path d="M 338.198 294 Q 476.198 282 614.198 294"
-          stroke="#d06d54" stroke-opacity="0.18" stroke-width="1.6" stroke-linecap="round" fill="none">
-      <animate attributeName="stroke-opacity" values="0.10;0.22;0.10" dur="11.5s" begin="-0.519s" repeatCount="indefinite" />
-    </path>
+    <ellipse cx="439" cy="164" rx="188" ry="122" fill="#ebdacc" opacity="0.28" />
+    <ellipse cx="511" cy="232" rx="120" ry="84" fill="#dae7ee" opacity="0.18" />
   </g>
 
-  <g transform="translate(476.198 207.233)">
-    <g transform="scale(1 1)">
-      <g>
-        <animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 -2;0 0;0 0;10 -18;16 -2;0 0" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-        <g>
-          <animateTransform attributeName="transform" type="rotate" values="0 0 0;0 0 0;0 0 0;-1 0 0;0 0 0;-3 0 0;2 0 0;0 0 0" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-          <g>
-            <animateTransform attributeName="transform" type="translate" values="0 0;0 -1.8;0 0"
-                              dur="4.8s" begin="-0.519s" repeatCount="indefinite" />
+  <g shape-rendering="crispEdges">
+    <rect x="405" y="110" width="164" height="8" fill="#94a7af" opacity="0.28" />
+    <rect x="389" y="118" width="8" height="180" fill="#94a7af" opacity="0.28" />
+    <rect x="577" y="118" width="8" height="180" fill="#94a7af" opacity="0.28" />
+    <rect x="421" y="142" width="132" height="8" fill="#5d6f79" opacity="0.18" />
 
-            <ellipse cx="8" cy="118" rx="162" ry="20" fill="#64747d" fill-opacity="0.16" />
+    <rect x="339" y="312" width="296" height="8" fill="#687983" opacity="0.88" />
+    <rect x="355" y="320" width="264" height="8" fill="#687983" opacity="0.64" />
+    <rect x="387" y="328" width="200" height="8" fill="#aab8c1" opacity="0.46" />
+  </g>
 
-            <g transform="translate(0 0)">
-              <path d="M -118 56 C -108 8 -18 -10 72 18 C 112 30 132 64 120 84 C 106 100 54 102 4 94 C -56 84 -100 82 -118 56 Z"
-                    fill="#fff8ef" />
-              <path d="M -118 56 C -108 8 -18 -10 72 18 C 112 30 132 64 120 84 C 106 100 54 102 4 94 C -56 84 -100 82 -118 56 Z"
-                    class="cat-line" />
-              <path d="M -92 48 C -70 18 -18 8 72 26" class="cat-line soft" />
-              <path d="M -16 74 C 18 82 58 84 94 78" class="cat-line soft" />
-              <path d="M -22 76 C -38 90 -18 100 14 94" class="cat-line soft" />
-              <path d="M 64 54 C 74 66 74 84 62 92" class="cat-line soft" />
-            </g>
+  <g transform="translate(396 168) scale(7 7)"
+     shape-rendering="crispEdges">
+    <g >
 
-            <g opacity="0.96">
-              <path d="M 68 78 C 84 88 90 96 92 108" class="cat-line" />
-              <path d="M 90 80 C 100 90 102 98 100 108" class="cat-line" />
-              <animate attributeName="opacity" values="1;1;0.7;0.08;0.22;0.56;1;1" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-            </g>
-
-            <g opacity="0">
-              <path d="M 70 78 C 82 60 88 40 86 18 C 86 4 92 -4 102 -8" class="cat-line" />
-              <animate attributeName="opacity" values="0;0;0.22;1;0;0;0;0" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-              <animateTransform attributeName="transform" type="translate" values="0 0;-2 -4;0 0;2 -2;0 0"
-                                dur="1.8s" begin="-0.519s" repeatCount="indefinite" />
-            </g>
-
-            <g opacity="0">
-              <path d="M 68 78 C 98 72 132 74 154 86" class="cat-line" />
-              <animate attributeName="opacity" values="0;0;0;0;1;0.42;0;0" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-              <animateTransform attributeName="transform" type="translate" values="0 0;2 -2;0 0"
-                                dur="2.6s" begin="-1.319s" repeatCount="indefinite" />
-            </g>
-
-            <g transform="translate(-108 58)">
-              <path d="M 0 0 C -34 -42 -92 -18 -82 26 C -76 56 -36 44 -18 26" class="tail-line" />
-              <animateTransform attributeName="transform" type="rotate" values="10 0 0;6 0 0;-4 0 0;7 0 0;10 0 0"
-                                dur="7.4s" begin="-1.319s" repeatCount="indefinite" />
-              <g transform="translate(-70 16)">
-                <path d="M 0 0 C -12 6 -14 18 -4 28" class="tail-tip" />
-                <animateTransform attributeName="transform" type="rotate" values="-10 0 0;12 0 0;-6 0 0"
-                                  dur="4.8s" begin="-2.119s" repeatCount="indefinite" />
-              </g>
-            </g>
-
-            <g transform="translate(98 12)">
-              <animateTransform attributeName="transform" type="translate" values="0 6;0 6;4 -4;-12 12;4 0;6 -2;2 4;0 6" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-              <g>
-                <animateTransform attributeName="transform" type="rotate" values="6 0 0;6 0 0;-18 0 0;-34 0 0;-6 0 0;8 0 0;10 0 0;6 0 0" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-                <g>
-                  <circle cx="0" cy="0" r="34" fill="#fff8ef" />
-                  <circle cx="0" cy="0" r="34" class="cat-line" />
-
-                  <g transform="translate(-12 -20)">
-                    <path d="M 0 0 L 8 -28 L 18 -2 Z" fill="#eee5d9" stroke="#28363d" stroke-width="3" stroke-linejoin="round" />
-                    <path d="M 7 -4 L 10 -18 L 14 -4" stroke="#d06d54" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.36" fill="none" />
-                    <animateTransform attributeName="transform" type="rotate" values="0 -12 -20;0 -12 -20;7 -12 -20;0 -12 -20;0 -12 -20"
-                                      keyTimes="0;0.56;0.6;0.64;1" dur="11.2s" begin="-2.119s" repeatCount="indefinite" />
-                  </g>
-                  <g transform="translate(12 -18)">
-                    <path d="M 0 0 L 12 -30 L 20 -2 Z" fill="#eee5d9" stroke="#28363d" stroke-width="3" stroke-linejoin="round" />
-                    <path d="M 8 -4 L 12 -20 L 16 -4" stroke="#d06d54" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.28" fill="none" />
-                    <animateTransform attributeName="transform" type="rotate" values="0 12 -18;0 12 -18;-6 12 -18;0 12 -18;0 12 -18"
-                                      keyTimes="0;0.42;0.46;0.5;1" dur="9.6s" begin="-2.119s" repeatCount="indefinite" />
-                  </g>
-
-                  <g opacity="0">
-                    <path d="M -6 -2 Q 2 2 10 -2" class="face-line" />
-                    <path d="M 14 -2 Q 22 2 30 -2" class="face-line" />
-                    <animate attributeName="opacity" values="1;1;0;0;0;0;1;1" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-                  </g>
-
-                  <g opacity="0">
-                    <path d="M -6 -4 L 10 -4" class="face-line" />
-                    <path d="M 14 -4 L 30 -4" class="face-line" />
-                    <animate attributeName="opacity" values="0;0;0.48;0.42;1;0.92;0;0" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-                  </g>
-
-                  <g opacity="0">
-                    <path d="M -6 -2 Q 2 1 10 -2" class="face-line" />
-                    <path d="M 14 -2 Q 22 1 30 -2" class="face-line" />
-                    <animate attributeName="opacity" values="0;0;0.9;0;0;0.9;0"
-                             keyTimes="0;0.53;0.545;0.56;0.63;0.645;1" dur="32s" repeatCount="indefinite" />
-                  </g>
-
-                  <path d="M 30 4 L 38 8 L 30 12 Z" fill="#d06d54" fill-opacity="0.72" />
-                  <path d="M 26 16 Q 33 20 40 16" class="face-line" opacity="0">
-                    <animate attributeName="opacity" values="1;1;0;0.12;0.3;0.1;1;1" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-                  </path>
-                  <ellipse cx="34" cy="18" rx="6" ry="0" fill="#d06d54" fill-opacity="0.16" stroke="#28363d" stroke-width="2.3" opacity="0">
-                    <animate attributeName="opacity" values="0;0;0.94;0;0;0;0;0" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-                    <animate attributeName="ry" values="0;0;12;2;0;0;0;0" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-                  </ellipse>
-                  <path d="M 30 18 C 34 26 40 28 44 24" stroke="#d06d54" stroke-width="2.4" stroke-linecap="round" fill="none" opacity="0">
-                    <animate attributeName="opacity" values="0;0;0;0.76;0;0;0;0" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-                  </path>
-
-                  <path d="M 34 10 L 56 6" class="whisker-line" />
-                  <path d="M 34 14 L 58 14" class="whisker-line" />
-                  <path d="M 34 18 L 56 22" class="whisker-line" />
-                </g>
-              </g>
-            </g>
-          </g>
-        </g>
+      <g opacity="0">
+        <animate attributeName="opacity" values="1;0;0;0;0;0;1"
+                 keyTimes="0;0.1875;0.3125;0.5;0.6875;0.8125;1" dur="32s" repeatCount="indefinite" />
+        <rect x="14" y="1" width="6" height="1" fill="#43352b" />
+      <rect x="13" y="2" width="2" height="1" fill="#43352b" />
+      <rect x="16" y="2" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="2" width="1" height="1" fill="#43352b" />
+      <rect x="13" y="3" width="1" height="1" fill="#43352b" />
+      <rect x="16" y="3" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="3" width="1" height="1" fill="#43352b" />
+      <rect x="12" y="4" width="2" height="1" fill="#43352b" />
+      <rect x="18" y="4" width="2" height="1" fill="#43352b" />
+      <rect x="5" y="5" width="8" height="1" fill="#43352b" />
+      <rect x="19" y="5" width="1" height="1" fill="#43352b" />
+      <rect x="1" y="6" width="5" height="1" fill="#43352b" />
+      <rect x="11" y="6" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="1" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="3" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="0" y="8" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="8" width="1" height="1" fill="#43352b" />
+      <rect x="-1" y="9" width="2" height="1" fill="#43352b" />
+      <rect x="18" y="9" width="2" height="1" fill="#43352b" />
+      <rect x="-1" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="2" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="16" y="10" width="3" height="1" fill="#43352b" />
+      <rect x="-1" y="11" width="2" height="1" fill="#43352b" />
+      <rect x="3" y="11" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="11" width="2" height="1" fill="#43352b" />
+      <rect x="0" y="12" width="6" height="1" fill="#43352b" />
+      <rect x="15" y="12" width="1" height="1" fill="#43352b" />
+      <rect x="5" y="13" width="5" height="1" fill="#43352b" />
+      <rect x="12" y="13" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="13" width="1" height="1" fill="#43352b" />
+      <rect x="9" y="14" width="7" height="1" fill="#43352b" />
+        <rect x="14" y="4" width="4" height="1" fill="#ead8b7" />
+      <rect x="13" y="5" width="6" height="1" fill="#ead8b7" />
+      <rect x="6" y="6" width="5" height="1" fill="#ead8b7" />
+      <rect x="13" y="6" width="6" height="1" fill="#ead8b7" />
+      <rect x="2" y="7" width="1" height="1" fill="#ead8b7" />
+      <rect x="4" y="7" width="15" height="1" fill="#ead8b7" />
+      <rect x="2" y="8" width="17" height="1" fill="#ead8b7" />
+      <rect x="1" y="9" width="17" height="1" fill="#ead8b7" />
+      <rect x="0" y="10" width="2" height="1" fill="#ead8b7" />
+      <rect x="3" y="10" width="13" height="1" fill="#ead8b7" />
+      <rect x="1" y="11" width="2" height="1" fill="#ead8b7" />
+      <rect x="4" y="11" width="11" height="1" fill="#ead8b7" />
+      <rect x="6" y="12" width="9" height="1" fill="#ead8b7" />
+      <rect x="10" y="13" width="2" height="1" fill="#ead8b7" />
+      <rect x="13" y="13" width="2" height="1" fill="#ead8b7" />
+        <rect x="14" y="8" width="3" height="1" fill="#cbb289" />
+      <rect x="6" y="9" width="7" height="1" fill="#cbb289" />
+      <rect x="7" y="10" width="5" height="1" fill="#cbb289" />
+        <rect x="15" y="2" width="1" height="1" fill="#f2dcc2" />
+      <rect x="18" y="2" width="1" height="1" fill="#f2dcc2" />
+      <rect x="14" y="3" width="2" height="1" fill="#f2dcc2" />
+      <rect x="17" y="3" width="2" height="1" fill="#f2dcc2" />
+        <rect x="15" y="6" width="2" height="1" fill="#43352b" />
+      <rect x="18" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="17" y="8" width="1" height="1" fill="#43352b" />
+        <rect x="18" y="7" width="1" height="1" fill="#ad6f71" />
+        <rect x="19" y="6" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="7" width="3" height="1" fill="#43352b" />
+      <rect x="19" y="8" width="2" height="1" fill="#43352b" />
       </g>
 
-      <g transform="translate(187.794 92)">
-        <animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 0;0 0;18 -4;34 -1;12 0;0 0" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
+      <g opacity="0">
+        <animate attributeName="opacity" values="0;1;0;0;0;0;0"
+                 keyTimes="0;0.1875;0.3125;0.5;0.6875;0.8125;1" dur="32s" repeatCount="indefinite" />
+        <rect x="14" y="0" width="6" height="1" fill="#43352b" />
+      <rect x="13" y="1" width="2" height="1" fill="#43352b" />
+      <rect x="16" y="1" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="1" width="1" height="1" fill="#43352b" />
+      <rect x="13" y="2" width="1" height="1" fill="#43352b" />
+      <rect x="16" y="2" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="2" width="1" height="1" fill="#43352b" />
+      <rect x="12" y="3" width="2" height="1" fill="#43352b" />
+      <rect x="18" y="3" width="2" height="1" fill="#43352b" />
+      <rect x="12" y="4" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="4" width="1" height="1" fill="#43352b" />
+      <rect x="5" y="5" width="8" height="1" fill="#43352b" />
+      <rect x="19" y="5" width="1" height="1" fill="#43352b" />
+      <rect x="1" y="6" width="5" height="1" fill="#43352b" />
+      <rect x="11" y="6" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="1" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="3" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="0" y="8" width="2" height="1" fill="#43352b" />
+      <rect x="18" y="8" width="2" height="1" fill="#43352b" />
+      <rect x="-1" y="9" width="2" height="1" fill="#43352b" />
+      <rect x="16" y="9" width="3" height="1" fill="#43352b" />
+      <rect x="-1" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="2" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="16" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="-1" y="11" width="2" height="1" fill="#43352b" />
+      <rect x="3" y="11" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="11" width="2" height="1" fill="#43352b" />
+      <rect x="0" y="12" width="6" height="1" fill="#43352b" />
+      <rect x="15" y="12" width="1" height="1" fill="#43352b" />
+      <rect x="5" y="13" width="5" height="1" fill="#43352b" />
+      <rect x="12" y="13" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="13" width="1" height="1" fill="#43352b" />
+      <rect x="9" y="14" width="7" height="1" fill="#43352b" />
+        <rect x="14" y="3" width="4" height="1" fill="#ead8b7" />
+      <rect x="13" y="4" width="6" height="1" fill="#ead8b7" />
+      <rect x="13" y="5" width="6" height="1" fill="#ead8b7" />
+      <rect x="6" y="6" width="5" height="1" fill="#ead8b7" />
+      <rect x="13" y="6" width="6" height="1" fill="#ead8b7" />
+      <rect x="2" y="7" width="1" height="1" fill="#ead8b7" />
+      <rect x="4" y="7" width="15" height="1" fill="#ead8b7" />
+      <rect x="2" y="8" width="16" height="1" fill="#ead8b7" />
+      <rect x="1" y="9" width="15" height="1" fill="#ead8b7" />
+      <rect x="0" y="10" width="2" height="1" fill="#ead8b7" />
+      <rect x="3" y="10" width="13" height="1" fill="#ead8b7" />
+      <rect x="1" y="11" width="2" height="1" fill="#ead8b7" />
+      <rect x="4" y="11" width="11" height="1" fill="#ead8b7" />
+      <rect x="6" y="12" width="9" height="1" fill="#ead8b7" />
+      <rect x="10" y="13" width="2" height="1" fill="#ead8b7" />
+      <rect x="13" y="13" width="2" height="1" fill="#ead8b7" />
+        <rect x="14" y="7" width="3" height="1" fill="#cbb289" />
+      <rect x="6" y="9" width="7" height="1" fill="#cbb289" />
+      <rect x="7" y="10" width="5" height="1" fill="#cbb289" />
+        <rect x="15" y="1" width="1" height="1" fill="#f2dcc2" />
+      <rect x="18" y="1" width="1" height="1" fill="#f2dcc2" />
+      <rect x="14" y="2" width="2" height="1" fill="#f2dcc2" />
+      <rect x="17" y="2" width="2" height="1" fill="#f2dcc2" />
+        <rect x="15" y="5" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="17" y="6" width="1" height="1" fill="#43352b" />
+        <rect x="18" y="6" width="1" height="1" fill="#ad6f71" />
+      <rect x="18" y="7" width="2" height="1" fill="#ad6f71" />
+      <rect x="18" y="8" width="2" height="1" fill="#ad6f71" />
+        <rect x="19" y="5" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="6" width="3" height="1" fill="#43352b" />
+      <rect x="19" y="7" width="2" height="1" fill="#43352b" />
+      </g>
+
+      <g opacity="0">
+        <animate attributeName="opacity" values="0;0;1;0;0;0;0"
+                 keyTimes="0;0.1875;0.3125;0.5;0.6875;0.8125;1" dur="32s" repeatCount="indefinite" />
+        <rect x="14" y="0" width="6" height="1" fill="#43352b" />
+      <rect x="13" y="1" width="2" height="1" fill="#43352b" />
+      <rect x="16" y="1" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="1" width="1" height="1" fill="#43352b" />
+      <rect x="13" y="2" width="1" height="1" fill="#43352b" />
+      <rect x="16" y="2" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="2" width="1" height="1" fill="#43352b" />
+      <rect x="12" y="3" width="2" height="1" fill="#43352b" />
+      <rect x="18" y="3" width="2" height="1" fill="#43352b" />
+      <rect x="12" y="4" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="4" width="1" height="1" fill="#43352b" />
+      <rect x="5" y="5" width="8" height="1" fill="#43352b" />
+      <rect x="19" y="5" width="1" height="1" fill="#43352b" />
+      <rect x="1" y="6" width="5" height="1" fill="#43352b" />
+      <rect x="11" y="6" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="1" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="3" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="0" y="8" width="2" height="1" fill="#43352b" />
+      <rect x="18" y="8" width="2" height="1" fill="#43352b" />
+      <rect x="-1" y="9" width="2" height="1" fill="#43352b" />
+      <rect x="17" y="9" width="2" height="1" fill="#43352b" />
+      <rect x="-1" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="2" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="17" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="-1" y="11" width="2" height="1" fill="#43352b" />
+      <rect x="3" y="11" width="1" height="1" fill="#43352b" />
+      <rect x="17" y="11" width="1" height="1" fill="#43352b" />
+      <rect x="0" y="12" width="6" height="1" fill="#43352b" />
+      <rect x="13" y="12" width="5" height="1" fill="#43352b" />
+      <rect x="5" y="13" width="6" height="1" fill="#43352b" />
+      <rect x="13" y="13" width="1" height="1" fill="#43352b" />
+      <rect x="10" y="14" width="4" height="1" fill="#43352b" />
+        <rect x="14" y="3" width="4" height="1" fill="#ead8b7" />
+      <rect x="13" y="4" width="6" height="1" fill="#ead8b7" />
+      <rect x="13" y="5" width="6" height="1" fill="#ead8b7" />
+      <rect x="6" y="6" width="5" height="1" fill="#ead8b7" />
+      <rect x="13" y="6" width="6" height="1" fill="#ead8b7" />
+      <rect x="2" y="7" width="1" height="1" fill="#ead8b7" />
+      <rect x="4" y="7" width="15" height="1" fill="#ead8b7" />
+      <rect x="2" y="8" width="16" height="1" fill="#ead8b7" />
+      <rect x="1" y="9" width="16" height="1" fill="#ead8b7" />
+      <rect x="0" y="10" width="2" height="1" fill="#ead8b7" />
+      <rect x="3" y="10" width="14" height="1" fill="#ead8b7" />
+      <rect x="1" y="11" width="2" height="1" fill="#ead8b7" />
+      <rect x="4" y="11" width="13" height="1" fill="#ead8b7" />
+      <rect x="6" y="12" width="7" height="1" fill="#ead8b7" />
+      <rect x="11" y="13" width="2" height="1" fill="#ead8b7" />
+        <rect x="14" y="7" width="3" height="1" fill="#cbb289" />
+      <rect x="6" y="9" width="7" height="1" fill="#cbb289" />
+      <rect x="7" y="10" width="5" height="1" fill="#cbb289" />
+        <rect x="15" y="1" width="1" height="1" fill="#f2dcc2" />
+      <rect x="18" y="1" width="1" height="1" fill="#f2dcc2" />
+      <rect x="14" y="2" width="2" height="1" fill="#f2dcc2" />
+      <rect x="17" y="2" width="2" height="1" fill="#f2dcc2" />
+        <rect x="15" y="5" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="17" y="6" width="1" height="1" fill="#43352b" />
+        <rect x="18" y="6" width="1" height="1" fill="#ad6f71" />
+      <rect x="18" y="7" width="1" height="1" fill="#ad6f71" />
+      <rect x="18" y="8" width="1" height="1" fill="#ad6f71" />
+        <rect x="19" y="5" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="6" width="3" height="1" fill="#43352b" />
+      <rect x="19" y="7" width="2" height="1" fill="#43352b" />
+      </g>
+
+      <g opacity="0">
+        <animate attributeName="opacity" values="0;0;0;1;0;0;0"
+                 keyTimes="0;0.1875;0.3125;0.5;0.6875;0.8125;1" dur="32s" repeatCount="indefinite" />
+        <rect x="14" y="1" width="6" height="1" fill="#43352b" />
+      <rect x="13" y="2" width="2" height="1" fill="#43352b" />
+      <rect x="16" y="2" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="2" width="1" height="1" fill="#43352b" />
+      <rect x="13" y="3" width="1" height="1" fill="#43352b" />
+      <rect x="16" y="3" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="3" width="1" height="1" fill="#43352b" />
+      <rect x="12" y="4" width="2" height="1" fill="#43352b" />
+      <rect x="18" y="4" width="2" height="1" fill="#43352b" />
+      <rect x="5" y="5" width="8" height="1" fill="#43352b" />
+      <rect x="19" y="5" width="1" height="1" fill="#43352b" />
+      <rect x="3" y="6" width="3" height="1" fill="#43352b" />
+      <rect x="12" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="0" y="7" width="4" height="1" fill="#43352b" />
+      <rect x="19" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="-1" y="8" width="2" height="1" fill="#43352b" />
+      <rect x="2" y="8" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="8" width="1" height="1" fill="#43352b" />
+      <rect x="-1" y="9" width="1" height="1" fill="#43352b" />
+      <rect x="18" y="9" width="2" height="1" fill="#43352b" />
+      <rect x="-1" y="10" width="3" height="1" fill="#43352b" />
+      <rect x="18" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="1" y="11" width="3" height="1" fill="#43352b" />
+      <rect x="18" y="11" width="1" height="1" fill="#43352b" />
+      <rect x="3" y="12" width="3" height="1" fill="#43352b" />
+      <rect x="14" y="12" width="5" height="1" fill="#43352b" />
+      <rect x="5" y="13" width="5" height="1" fill="#43352b" />
+      <rect x="12" y="13" width="3" height="1" fill="#43352b" />
+      <rect x="9" y="14" width="4" height="1" fill="#43352b" />
+        <rect x="14" y="4" width="4" height="1" fill="#ead8b7" />
+      <rect x="13" y="5" width="6" height="1" fill="#ead8b7" />
+      <rect x="6" y="6" width="6" height="1" fill="#ead8b7" />
+      <rect x="13" y="6" width="6" height="1" fill="#ead8b7" />
+      <rect x="4" y="7" width="15" height="1" fill="#ead8b7" />
+      <rect x="1" y="8" width="1" height="1" fill="#ead8b7" />
+      <rect x="3" y="8" width="16" height="1" fill="#ead8b7" />
+      <rect x="0" y="9" width="18" height="1" fill="#ead8b7" />
+      <rect x="2" y="10" width="16" height="1" fill="#ead8b7" />
+      <rect x="4" y="11" width="14" height="1" fill="#ead8b7" />
+      <rect x="6" y="12" width="8" height="1" fill="#ead8b7" />
+      <rect x="10" y="13" width="2" height="1" fill="#ead8b7" />
+        <rect x="14" y="8" width="3" height="1" fill="#cbb289" />
+      <rect x="6" y="9" width="8" height="1" fill="#cbb289" />
+      <rect x="7" y="10" width="6" height="1" fill="#cbb289" />
+        <rect x="15" y="2" width="1" height="1" fill="#f2dcc2" />
+      <rect x="18" y="2" width="1" height="1" fill="#f2dcc2" />
+      <rect x="14" y="3" width="2" height="1" fill="#f2dcc2" />
+      <rect x="17" y="3" width="2" height="1" fill="#f2dcc2" />
+        <rect x="15" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="17" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="18" y="7" width="1" height="1" fill="#43352b" />
+        <rect x="18" y="7" width="1" height="1" fill="#ad6f71" />
+        <rect x="19" y="6" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="7" width="3" height="1" fill="#43352b" />
+      <rect x="19" y="8" width="2" height="1" fill="#43352b" />
+      </g>
+
+      <g opacity="0">
+        <animate attributeName="opacity" values="0;0;0;0;1;0;0"
+                 keyTimes="0;0.1875;0.3125;0.5;0.6875;0.8125;1" dur="32s" repeatCount="indefinite" />
+        <rect x="13" y="-1" width="6" height="1" fill="#43352b" />
+      <rect x="12" y="0" width="2" height="1" fill="#43352b" />
+      <rect x="15" y="0" width="2" height="1" fill="#43352b" />
+      <rect x="18" y="0" width="1" height="1" fill="#43352b" />
+      <rect x="12" y="1" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="1" width="1" height="1" fill="#43352b" />
+      <rect x="18" y="1" width="1" height="1" fill="#43352b" />
+      <rect x="11" y="2" width="2" height="1" fill="#43352b" />
+      <rect x="17" y="2" width="2" height="1" fill="#43352b" />
+      <rect x="0" y="3" width="4" height="1" fill="#43352b" />
+      <rect x="5" y="3" width="7" height="1" fill="#43352b" />
+      <rect x="18" y="3" width="1" height="1" fill="#43352b" />
+      <rect x="0" y="4" width="1" height="1" fill="#43352b" />
+      <rect x="3" y="4" width="3" height="1" fill="#43352b" />
+      <rect x="18" y="4" width="1" height="1" fill="#43352b" />
+      <rect x="0" y="5" width="2" height="1" fill="#43352b" />
+      <rect x="4" y="5" width="1" height="1" fill="#43352b" />
+      <rect x="18" y="5" width="1" height="1" fill="#43352b" />
+      <rect x="1" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="18" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="1" y="7" width="2" height="1" fill="#43352b" />
+      <rect x="17" y="7" width="2" height="1" fill="#43352b" />
+      <rect x="2" y="8" width="1" height="1" fill="#43352b" />
+      <rect x="14" y="8" width="4" height="1" fill="#43352b" />
+      <rect x="2" y="9" width="3" height="1" fill="#43352b" />
+      <rect x="13" y="9" width="3" height="1" fill="#43352b" />
+      <rect x="4" y="10" width="2" height="1" fill="#43352b" />
+      <rect x="8" y="10" width="2" height="1" fill="#43352b" />
+      <rect x="12" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="5" y="11" width="1" height="1" fill="#43352b" />
+      <rect x="8" y="11" width="2" height="1" fill="#43352b" />
+      <rect x="12" y="11" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="11" width="1" height="1" fill="#43352b" />
+      <rect x="5" y="12" width="1" height="1" fill="#43352b" />
+      <rect x="8" y="12" width="2" height="1" fill="#43352b" />
+      <rect x="12" y="12" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="12" width="1" height="1" fill="#43352b" />
+      <rect x="5" y="13" width="11" height="1" fill="#43352b" />
+        <rect x="13" y="2" width="4" height="1" fill="#ead8b7" />
+      <rect x="12" y="3" width="6" height="1" fill="#ead8b7" />
+      <rect x="1" y="4" width="2" height="1" fill="#ead8b7" />
+      <rect x="6" y="4" width="12" height="1" fill="#ead8b7" />
+      <rect x="2" y="5" width="2" height="1" fill="#ead8b7" />
+      <rect x="5" y="5" width="13" height="1" fill="#ead8b7" />
+      <rect x="2" y="6" width="16" height="1" fill="#ead8b7" />
+      <rect x="3" y="7" width="14" height="1" fill="#ead8b7" />
+      <rect x="3" y="8" width="11" height="1" fill="#ead8b7" />
+      <rect x="5" y="9" width="8" height="1" fill="#ead8b7" />
+      <rect x="6" y="10" width="2" height="1" fill="#ead8b7" />
+      <rect x="10" y="10" width="2" height="1" fill="#ead8b7" />
+      <rect x="13" y="10" width="2" height="1" fill="#ead8b7" />
+      <rect x="6" y="11" width="2" height="1" fill="#ead8b7" />
+      <rect x="10" y="11" width="2" height="1" fill="#ead8b7" />
+      <rect x="13" y="11" width="2" height="1" fill="#ead8b7" />
+      <rect x="6" y="12" width="2" height="1" fill="#ead8b7" />
+      <rect x="10" y="12" width="2" height="1" fill="#ead8b7" />
+      <rect x="13" y="12" width="2" height="1" fill="#ead8b7" />
+        <rect x="13" y="6" width="3" height="1" fill="#cbb289" />
+      <rect x="6" y="7" width="5" height="1" fill="#cbb289" />
+      <rect x="7" y="8" width="4" height="1" fill="#cbb289" />
+        <rect x="14" y="0" width="1" height="1" fill="#f2dcc2" />
+      <rect x="17" y="0" width="1" height="1" fill="#f2dcc2" />
+      <rect x="13" y="1" width="2" height="1" fill="#f2dcc2" />
+      <rect x="16" y="1" width="2" height="1" fill="#f2dcc2" />
+        <rect x="14" y="4" width="1" height="1" fill="#43352b" />
+      <rect x="16" y="4" width="1" height="1" fill="#43352b" />
+      <rect x="14" y="5" width="1" height="1" fill="#43352b" />
+      <rect x="16" y="5" width="1" height="1" fill="#43352b" />
+        <rect x="17" y="5" width="1" height="1" fill="#ad6f71" />
+      <rect x="17" y="6" width="1" height="1" fill="#ad6f71" />
+        <rect x="18" y="4" width="2" height="1" fill="#43352b" />
+      <rect x="18" y="5" width="3" height="1" fill="#43352b" />
+      <rect x="18" y="6" width="2" height="1" fill="#43352b" />
+      </g>
+
+      <g opacity="0">
+        <animate attributeName="opacity" values="0;0;0;0;0;1;0"
+                 keyTimes="0;0.1875;0.3125;0.5;0.6875;0.8125;1" dur="32s" repeatCount="indefinite" />
+        <rect x="14" y="1" width="6" height="1" fill="#43352b" />
+      <rect x="13" y="2" width="2" height="1" fill="#43352b" />
+      <rect x="16" y="2" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="2" width="1" height="1" fill="#43352b" />
+      <rect x="13" y="3" width="1" height="1" fill="#43352b" />
+      <rect x="16" y="3" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="3" width="1" height="1" fill="#43352b" />
+      <rect x="12" y="4" width="2" height="1" fill="#43352b" />
+      <rect x="18" y="4" width="2" height="1" fill="#43352b" />
+      <rect x="5" y="5" width="8" height="1" fill="#43352b" />
+      <rect x="19" y="5" width="1" height="1" fill="#43352b" />
+      <rect x="1" y="6" width="5" height="1" fill="#43352b" />
+      <rect x="11" y="6" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="1" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="3" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="19" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="0" y="8" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="8" width="1" height="1" fill="#43352b" />
+      <rect x="-1" y="9" width="2" height="1" fill="#43352b" />
+      <rect x="18" y="9" width="2" height="1" fill="#43352b" />
+      <rect x="-1" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="2" y="10" width="1" height="1" fill="#43352b" />
+      <rect x="16" y="10" width="3" height="1" fill="#43352b" />
+      <rect x="-1" y="11" width="2" height="1" fill="#43352b" />
+      <rect x="3" y="11" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="11" width="2" height="1" fill="#43352b" />
+      <rect x="0" y="12" width="6" height="1" fill="#43352b" />
+      <rect x="15" y="12" width="1" height="1" fill="#43352b" />
+      <rect x="5" y="13" width="5" height="1" fill="#43352b" />
+      <rect x="12" y="13" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="13" width="1" height="1" fill="#43352b" />
+      <rect x="9" y="14" width="7" height="1" fill="#43352b" />
+        <rect x="14" y="4" width="4" height="1" fill="#ead8b7" />
+      <rect x="13" y="5" width="6" height="1" fill="#ead8b7" />
+      <rect x="6" y="6" width="5" height="1" fill="#ead8b7" />
+      <rect x="13" y="6" width="6" height="1" fill="#ead8b7" />
+      <rect x="2" y="7" width="1" height="1" fill="#ead8b7" />
+      <rect x="4" y="7" width="15" height="1" fill="#ead8b7" />
+      <rect x="2" y="8" width="17" height="1" fill="#ead8b7" />
+      <rect x="1" y="9" width="17" height="1" fill="#ead8b7" />
+      <rect x="0" y="10" width="2" height="1" fill="#ead8b7" />
+      <rect x="3" y="10" width="13" height="1" fill="#ead8b7" />
+      <rect x="1" y="11" width="2" height="1" fill="#ead8b7" />
+      <rect x="4" y="11" width="11" height="1" fill="#ead8b7" />
+      <rect x="6" y="12" width="9" height="1" fill="#ead8b7" />
+      <rect x="10" y="13" width="2" height="1" fill="#ead8b7" />
+      <rect x="13" y="13" width="2" height="1" fill="#ead8b7" />
+        <rect x="14" y="8" width="3" height="1" fill="#cbb289" />
+      <rect x="6" y="9" width="7" height="1" fill="#cbb289" />
+      <rect x="7" y="10" width="5" height="1" fill="#cbb289" />
+        <rect x="15" y="2" width="1" height="1" fill="#f2dcc2" />
+      <rect x="18" y="2" width="1" height="1" fill="#f2dcc2" />
+      <rect x="14" y="3" width="2" height="1" fill="#f2dcc2" />
+      <rect x="17" y="3" width="2" height="1" fill="#f2dcc2" />
+        <rect x="15" y="6" width="1" height="1" fill="#43352b" />
+      <rect x="15" y="7" width="1" height="1" fill="#43352b" />
+      <rect x="17" y="7" width="1" height="1" fill="#43352b" />
+        <rect x="18" y="7" width="1" height="1" fill="#ad6f71" />
+      <rect x="18" y="8" width="1" height="1" fill="#ad6f71" />
+        <rect x="19" y="6" width="2" height="1" fill="#43352b" />
+      <rect x="19" y="7" width="3" height="1" fill="#43352b" />
+      <rect x="19" y="8" width="2" height="1" fill="#43352b" />
+      </g>
+
+      <g transform="translate(0 0)">
+        <animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 0;2 -1;5 -4;1 0;0 0"
+                          keyTimes="0;0.1875;0.3125;0.5;0.6875;0.8125;1" dur="32s" repeatCount="indefinite" />
         <g>
-          <animateTransform attributeName="transform" type="rotate" values="0 0 0;0 0 0;0 0 0;0 0 0;120 0 0;270 0 0;360 0 0;360 0 0" keyTimes="0;0.1875;0.3125;0.5;0.6875;0.75;0.8125;1" dur="32s" repeatCount="indefinite" />
-          <circle cx="0" cy="0" r="19" fill="#daa96b" fill-opacity="0.24" stroke="#8c5b41" stroke-width="2.6" />
-          <path d="M -12 -4 C -4 -10 8 -10 12 -2 C 14 4 8 10 -2 11" stroke="#8c5b41" stroke-width="2.2" stroke-linecap="round" fill="none" />
-          <path d="M -15 5 C -7 0 1 0 6 6" stroke="#d06d54" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.52" />
-          <path d="M -18 5 C -28 2 -36 4 -44 10" stroke="#8c5b41" stroke-width="1.9" stroke-linecap="round" fill="none" opacity="0.56" />
-          <circle cx="0" cy="0" r="2.2" fill="#d06d54" />
+          <animateTransform attributeName="transform" type="rotate" values="0 0 0;0 0 0;0 0 0;90 0 0;260 0 0;320 0 0;360 0 0"
+                            keyTimes="0;0.1875;0.3125;0.5;0.6875;0.8125;1" dur="32s" repeatCount="indefinite" />
+          <rect x="23" y="9" width="3" height="1" fill="#8b593f" />
+      <rect x="22" y="10" width="2" height="1" fill="#8b593f" />
+      <rect x="25" y="10" width="2" height="1" fill="#8b593f" />
+      <rect x="22" y="11" width="1" height="1" fill="#8b593f" />
+      <rect x="26" y="11" width="2" height="1" fill="#8b593f" />
+      <rect x="20" y="12" width="3" height="1" fill="#8b593f" />
+      <rect x="27" y="12" width="1" height="1" fill="#8b593f" />
+      <rect x="22" y="13" width="1" height="1" fill="#8b593f" />
+      <rect x="26" y="13" width="2" height="1" fill="#8b593f" />
+      <rect x="22" y="14" width="5" height="1" fill="#8b593f" />
+          <rect x="24" y="10" width="1" height="1" fill="#d2a06a" />
+      <rect x="23" y="11" width="3" height="1" fill="#d2a06a" />
+      <rect x="23" y="12" width="4" height="1" fill="#d2a06a" />
+      <rect x="23" y="13" width="3" height="1" fill="#d2a06a" />
+          <rect x="24" y="12" width="1" height="1" fill="#ad6f71" />
         </g>
       </g>
     </g>
