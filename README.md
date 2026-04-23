@@ -3,7 +3,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat.svg">
-  <img alt="Animated line-art cat artwork" src="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat.svg">
+  <img alt="Animated pixel-art cat artwork" src="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat.svg">
 </picture>
 
 </div>
