@@ -32,10 +32,13 @@ class FurPalette:
     outline: str
     fill: str
     shade: str
+    marking: str
+    marking_shade: str
     ear: str
     blush: str
     nose: str
     mouth: str
+    eye: str
     yarn: str
     yarn_shade: str
 
@@ -79,9 +82,20 @@ DARK_SCENES = [
 ]
 
 FUR_PALETTES = [
-    FurPalette("#111111", "#9f9f9f", "#6c6c6c", "#7b7b7b", "#e8a9c0", "#f0c6c7", "#6b3941", "#c14e53", "#8b363b"),
-    FurPalette("#111111", "#cfcfd1", "#999ca2", "#b4b6bc", "#e8a9c0", "#f0c6c7", "#6b3941", "#a26ad6", "#7245a3"),
-    FurPalette("#111111", "#e0bf94", "#b58f67", "#c8a37d", "#e8a9c0", "#f0c6c7", "#6b3941", "#d58e4d", "#9d6434"),
+    FurPalette(
+        "#111111",
+        "#666b74",
+        "#474b53",
+        "#f1f0ec",
+        "#d8dae0",
+        "#8d6f71",
+        "#e7b6c8",
+        "#efb6bf",
+        "#7e4953",
+        "#b0ab53",
+        "#5d98d1",
+        "#3d6790",
+    ),
 ]
 
 FRAME_SPECS = [
@@ -115,7 +129,7 @@ def build_seed(moment: datetime) -> int:
 def choose_variant(moment: datetime) -> Variant:
     rng = random.Random(build_seed(moment))
     return Variant(
-        fur_index=rng.randrange(len(FUR_PALETTES)),
+        fur_index=0,
         scene_index=rng.randrange(3),
         cat_dx=rng.randrange(-2, 3),
         yarn_dx=rng.randrange(-3, 4),
@@ -271,23 +285,47 @@ def cat_layers(spec: FrameSpec, variant: Variant) -> dict[str, set[tuple[int, in
     shade |= rect_cells(5, -7 + spec.head_dy, 2, 3)
     shade |= mirror_cells(rect_cells(12, 5 + spec.body_dy, 2, 2), facing)
 
+    markings = ellipse_cells(0, 0 + spec.head_dy, 4, 5)
+    markings |= rect_cells(-2, -8 + spec.head_dy, 4, 5)
+    markings |= ellipse_cells(0, 6 + spec.body_dy, 6, 8)
+    markings |= rect_cells(-4, 10 + spec.body_dy, 3, 4)
+    markings |= rect_cells(2, 10 + spec.body_dy, 3, 4)
+    markings &= fur
+
+    marking_shade = ellipse_cells(0, 9 + spec.body_dy, 4, 4)
+    marking_shade |= rect_cells(-2, 2 + spec.body_dy, 4, 3)
+    marking_shade &= markings
+
     blush = {(-6, -4 + spec.head_dy), (-5, -4 + spec.head_dy), (5, -4 + spec.head_dy), (6, -4 + spec.head_dy)}
 
     nose = {(0, -3 + spec.head_dy)}
     if spec.mouth == "wide-open":
         nose |= {(0, -4 + spec.head_dy)}
 
-    features: set[tuple[int, int]] = set()
+    eyes: set[tuple[int, int]] = set()
+    pupils: set[tuple[int, int]] = set()
     mouth: set[tuple[int, int]] = set()
+    whiskers = {
+        (-9, -2 + spec.head_dy),
+        (-8, -2 + spec.head_dy),
+        (-9, -1 + spec.head_dy),
+        (-8, 0 + spec.head_dy),
+        (8, -2 + spec.head_dy),
+        (9, -2 + spec.head_dy),
+        (8, 0 + spec.head_dy),
+        (9, -1 + spec.head_dy),
+    }
 
     if spec.eyes == "open":
-        features |= {(-4, -5 + spec.head_dy), (-4, -4 + spec.head_dy), (4, -5 + spec.head_dy), (4, -4 + spec.head_dy)}
+        eyes |= {(-4, -5 + spec.head_dy), (-4, -4 + spec.head_dy), (4, -5 + spec.head_dy), (4, -4 + spec.head_dy)}
+        pupils |= {(-4, -4 + spec.head_dy), (4, -4 + spec.head_dy)}
     elif spec.eyes == "blink":
-        features |= {(-5, -4 + spec.head_dy), (-4, -4 + spec.head_dy), (4, -4 + spec.head_dy), (5, -4 + spec.head_dy)}
+        pupils |= {(-5, -4 + spec.head_dy), (-4, -4 + spec.head_dy), (4, -4 + spec.head_dy), (5, -4 + spec.head_dy)}
     elif spec.eyes == "soft":
-        features |= {(-5, -5 + spec.head_dy), (-4, -5 + spec.head_dy), (4, -5 + spec.head_dy), (5, -5 + spec.head_dy)}
+        eyes |= {(-5, -5 + spec.head_dy), (-4, -5 + spec.head_dy), (4, -5 + spec.head_dy), (5, -5 + spec.head_dy)}
+        pupils |= {(-4, -5 + spec.head_dy), (4, -5 + spec.head_dy)}
     else:
-        features |= {(-5, -4 + spec.head_dy), (-4, -4 + spec.head_dy), (4, -4 + spec.head_dy), (5, -4 + spec.head_dy)}
+        pupils |= {(-5, -4 + spec.head_dy), (-4, -4 + spec.head_dy), (4, -4 + spec.head_dy), (5, -4 + spec.head_dy)}
 
     if spec.mouth == "smile":
         mouth |= {(-1, -2 + spec.head_dy), (0, -1 + spec.head_dy), (1, -2 + spec.head_dy)}
@@ -308,11 +346,15 @@ def cat_layers(spec: FrameSpec, variant: Variant) -> dict[str, set[tuple[int, in
         "outline": shift_cells(outline, origin_x, origin_y),
         "fur": shift_cells(fur, origin_x, origin_y),
         "shade": shift_cells(shade & fur, origin_x, origin_y),
+        "markings": shift_cells(markings, origin_x, origin_y),
+        "marking_shade": shift_cells(marking_shade, origin_x, origin_y),
         "ear": shift_cells(ear & fur, origin_x, origin_y),
         "blush": shift_cells(blush, origin_x, origin_y),
         "nose": shift_cells(nose, origin_x, origin_y),
-        "features": shift_cells(features, origin_x, origin_y),
+        "eyes": shift_cells(eyes, origin_x, origin_y),
+        "pupils": shift_cells(pupils, origin_x, origin_y),
         "mouth": shift_cells(mouth, origin_x, origin_y),
+        "whiskers": shift_cells(whiskers, origin_x, origin_y),
     }
 
 
@@ -337,10 +379,13 @@ def build_theme(scene: ScenePalette, fur: FurPalette) -> tuple[list[str], dict[s
         fur.outline,
         fur.fill,
         fur.shade,
+        fur.marking,
+        fur.marking_shade,
         fur.ear,
         fur.blush,
         fur.nose,
         fur.mouth,
+        fur.eye,
         fur.yarn,
         fur.yarn_shade,
     ]
@@ -376,11 +421,15 @@ def render_logical_frame(
     paint_cells(canvas, cat["outline"], color_index[fur.outline])
     paint_cells(canvas, cat["fur"], color_index[fur.fill])
     paint_cells(canvas, cat["shade"], color_index[fur.shade])
+    paint_cells(canvas, cat["markings"], color_index[fur.marking])
+    paint_cells(canvas, cat["marking_shade"], color_index[fur.marking_shade])
     paint_cells(canvas, cat["ear"], color_index[fur.ear])
     paint_cells(canvas, cat["blush"], color_index[fur.blush])
     paint_cells(canvas, cat["nose"], color_index[fur.nose])
-    paint_cells(canvas, cat["features"], color_index[fur.outline])
+    paint_cells(canvas, cat["eyes"], color_index[fur.eye])
+    paint_cells(canvas, cat["pupils"], color_index[fur.outline])
     paint_cells(canvas, cat["mouth"], color_index[fur.mouth])
+    paint_cells(canvas, cat["whiskers"], color_index[fur.marking_shade])
 
     for offset in range(spec.sleep_marks):
         draw_glyph(canvas, 58 + offset * 4, 6 - offset * 3, "Z", color_index[scene.sparkle])
