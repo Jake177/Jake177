@@ -2,14 +2,22 @@ name: Generate Profile Cat
 
 on:
   schedule:
-    - cron: "0 */4 * * *"
+    - cron: "17 */4 * * *"
   workflow_dispatch:
   push:
     branches:
       - main
+    paths:
+      - ".github/workflows/snake.yml"
+      - "requirements.txt"
+      - "scripts/generate_profile_cat.py"
 
 permissions:
   contents: write
+
+concurrency:
+  group: generate-profile-cat
+  cancel-in-progress: true
 
 jobs:
   generate:
@@ -23,7 +31,9 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
 
       - name: Install dependencies
         run: python3 -m pip install -r requirements.txt
@@ -31,10 +41,31 @@ jobs:
       - name: Generate pixel cat gif
         run: python3 scripts/generate_profile_cat.py
 
+      - name: Validate generated artwork
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          expected = [
+              Path("dist/profile-cat.gif"),
+              Path("dist/profile-cat-dark.gif"),
+              Path("dist/profile-cat-sheet.png"),
+              Path("dist/profile-cat-dark-sheet.png"),
+          ]
+
+          for path in expected:
+              if not path.exists():
+                  raise SystemExit(f"missing generated file: {path}")
+              with Image.open(path) as image:
+                  image.verify()
+          PY
+
       - name: Push generated artwork to output branch
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: output
+          force_orphan: true
           commit_message: "Generate pixel cat gif"
