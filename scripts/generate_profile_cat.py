@@ -5,9 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from hashlib import sha256
+import json
 from pathlib import Path
 import random
-from PIL import Image
+from typing import Any
+from PIL import Image, ImageDraw
 
 WIDTH = 960
 HEIGHT = 420
@@ -15,6 +17,7 @@ SCALE = 10
 GRID_WIDTH = WIDTH // SCALE
 GRID_HEIGHT = HEIGHT // SCALE
 DIST_DIR = Path("dist")
+PROFILE_MAP_PATH = Path("assets/codex-pet/profile-map.json")
 
 
 @dataclass(frozen=True)
@@ -67,6 +70,24 @@ class FrameSpec:
     yarn_dx: int = 0
     yarn_dy: int = 0
     sleep_marks: int = 0
+
+
+@dataclass(frozen=True)
+class SpriteFrame:
+    x: int
+    y: int
+    duration_ms: int
+
+
+@dataclass(frozen=True)
+class ProfileMap:
+    map_path: Path
+    spritesheet: Path
+    frame_width: int
+    frame_height: int
+    scale: float
+    animations: dict[str, list[SpriteFrame]]
+    profile_sequence: list[str]
 
 
 LIGHT_SCENES = [
@@ -487,7 +508,180 @@ def write_sprite_sheet(path: Path, logical_frames: list[list[list[int]]], palett
     sheet.save(path)
 
 
+def require_positive_int(data: dict[str, Any], key: str, context: str) -> int:
+    value = data.get(key)
+    if not isinstance(value, int) or value <= 0:
+        raise ValueError(f"{context}.{key} must be a positive integer")
+    return value
+
+
+def load_profile_map(path: Path = PROFILE_MAP_PATH) -> ProfileMap:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("profile map must be a JSON object")
+
+    spritesheet_name = data.get("spritesheet")
+    if not isinstance(spritesheet_name, str) or not spritesheet_name:
+        raise ValueError("profile map spritesheet must be a non-empty string")
+
+    frame_width = require_positive_int(data, "frameWidth", "profile map")
+    frame_height = require_positive_int(data, "frameHeight", "profile map")
+    scale = data.get("scale", 1)
+    if not isinstance(scale, (int, float)) or scale <= 0:
+        raise ValueError("profile map scale must be a positive number")
+
+    raw_animations = data.get("animations")
+    if not isinstance(raw_animations, dict) or not raw_animations:
+        raise ValueError("profile map animations must be a non-empty object")
+
+    animations: dict[str, list[SpriteFrame]] = {}
+    for name, raw_frames in raw_animations.items():
+        if not isinstance(name, str) or not name:
+            raise ValueError("profile map animation names must be non-empty strings")
+        if not isinstance(raw_frames, list) or not raw_frames:
+            raise ValueError(f"animation {name} must contain at least one frame")
+
+        frames: list[SpriteFrame] = []
+        for index, raw_frame in enumerate(raw_frames):
+            if not isinstance(raw_frame, dict):
+                raise ValueError(f"animation {name} frame {index} must be an object")
+            frames.append(
+                SpriteFrame(
+                    x=require_positive_or_zero_int(raw_frame, "x", f"animation {name} frame {index}"),
+                    y=require_positive_or_zero_int(raw_frame, "y", f"animation {name} frame {index}"),
+                    duration_ms=require_positive_int(raw_frame, "durationMs", f"animation {name} frame {index}"),
+                )
+            )
+        animations[name] = frames
+
+    raw_sequence = data.get("profileSequence")
+    if not isinstance(raw_sequence, list) or not raw_sequence:
+        raise ValueError("profileSequence must contain at least one animation name")
+    profile_sequence: list[str] = []
+    for name in raw_sequence:
+        if not isinstance(name, str) or name not in animations:
+            raise ValueError(f"profileSequence references unknown animation: {name}")
+        profile_sequence.append(name)
+
+    return ProfileMap(
+        map_path=path,
+        spritesheet=path.parent / spritesheet_name,
+        frame_width=frame_width,
+        frame_height=frame_height,
+        scale=float(scale),
+        animations=animations,
+        profile_sequence=profile_sequence,
+    )
+
+
+def require_positive_or_zero_int(data: dict[str, Any], key: str, context: str) -> int:
+    value = data.get(key)
+    if not isinstance(value, int) or value < 0:
+        raise ValueError(f"{context}.{key} must be zero or a positive integer")
+    return value
+
+
+def build_profile_frames(spec: ProfileMap) -> tuple[list[Image.Image], list[int]]:
+    if not spec.spritesheet.exists():
+        raise FileNotFoundError(f"missing spritesheet: {spec.spritesheet}")
+
+    with Image.open(spec.spritesheet) as source:
+        sheet = source.convert("RGBA")
+
+    frames: list[Image.Image] = []
+    durations: list[int] = []
+    for animation_name in spec.profile_sequence:
+        for frame in spec.animations[animation_name]:
+            right = frame.x + spec.frame_width
+            bottom = frame.y + spec.frame_height
+            if right > sheet.width or bottom > sheet.height:
+                raise ValueError(
+                    f"animation {animation_name} frame ({frame.x}, {frame.y}) is outside sprite sheet "
+                    f"{sheet.width}x{sheet.height}"
+                )
+            frames.append(sheet.crop((frame.x, frame.y, right, bottom)))
+            durations.append(frame.duration_ms)
+
+    if not frames:
+        raise ValueError("profile sequence produced no frames")
+    return frames, durations
+
+
+def render_profile_banner_frame(pet_frame: Image.Image, scene: ScenePalette, scale: float) -> Image.Image:
+    canvas = Image.new("RGB", (WIDTH, HEIGHT), hex_to_rgb(scene.background))
+    draw = ImageDraw.Draw(canvas)
+    draw.ellipse((250, 46, 710, 338), fill=hex_to_rgb(scene.halo))
+    draw.ellipse((274, 330, 686, 404), fill=hex_to_rgb(scene.platform_shadow))
+    draw.ellipse((312, 320, 648, 382), fill=hex_to_rgb(scene.platform))
+    draw.ellipse((326, 310, 634, 366), fill=hex_to_rgb(scene.cat_shadow))
+
+    sprite = pet_frame.convert("RGBA")
+    if scale != 1:
+        sprite = sprite.resize(
+            (max(1, round(sprite.width * scale)), max(1, round(sprite.height * scale))),
+            Image.Resampling.NEAREST,
+        )
+    offset = ((WIDTH - sprite.width) // 2, 342 - sprite.height)
+    canvas.paste(sprite, offset, sprite)
+    return canvas
+
+
+def write_profile_gif(
+    path: Path,
+    pet_frames: list[Image.Image],
+    durations_ms: list[int],
+    scene: ScenePalette,
+    scale: float,
+) -> None:
+    frames = [render_profile_banner_frame(frame, scene, scale) for frame in pet_frames]
+    frames[0].save(
+        path,
+        save_all=True,
+        append_images=frames[1:],
+        duration=durations_ms,
+        loop=0,
+        disposal=2,
+        optimize=False,
+    )
+
+
+def write_profile_contact_sheet(
+    path: Path,
+    pet_frames: list[Image.Image],
+    scene: ScenePalette,
+    scale: float,
+) -> None:
+    previews = [render_profile_banner_frame(frame, scene, scale).crop((250, 40, 710, 400)) for frame in pet_frames]
+    tile_width, tile_height = previews[0].size
+    columns = min(8, len(previews))
+    rows = (len(previews) + columns - 1) // columns
+    gap = 8
+    sheet = Image.new(
+        "RGB",
+        (columns * tile_width + (columns - 1) * gap, rows * tile_height + (rows - 1) * gap),
+        hex_to_rgb(scene.background),
+    )
+    for index, preview in enumerate(previews):
+        x = (index % columns) * (tile_width + gap)
+        y = (index // columns) * (tile_height + gap)
+        sheet.paste(preview, (x, y))
+    sheet.save(path)
+
+
+def generate_profile_pet_assets(theme: str, moment: datetime, output_name: str) -> None:
+    variant = choose_variant(moment)
+    scene = (DARK_SCENES if theme == "dark" else LIGHT_SCENES)[variant.scene_index]
+    spec = load_profile_map()
+    pet_frames, durations = build_profile_frames(spec)
+    write_profile_gif(DIST_DIR / f"{output_name}.gif", pet_frames, durations, scene, spec.scale)
+    write_profile_contact_sheet(DIST_DIR / f"{output_name}-sheet.png", pet_frames, scene, spec.scale)
+
+
 def generate_assets(theme: str, moment: datetime, output_name: str) -> None:
+    if PROFILE_MAP_PATH.exists():
+        generate_profile_pet_assets(theme, moment, output_name)
+        return
+
     variant = choose_variant(moment)
     scene = (DARK_SCENES if theme == "dark" else LIGHT_SCENES)[variant.scene_index]
     fur = FUR_PALETTES[variant.fur_index]

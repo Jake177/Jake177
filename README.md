@@ -1,9 +1,9 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat-dark.gif?v=20260423gif2">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat.gif?v=20260423gif2">
-  <img alt="Animated pixel cat gif artwork" src="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat.gif?v=20260423gif2">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat-dark.gif?v=20260507-kunkunchick">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat.gif?v=20260507-kunkunchick">
+  <img alt="Animated KunKunChick Codex pet artwork" src="https://raw.githubusercontent.com/Jake177/Jake177/output/profile-cat.gif?v=20260507-kunkunchick">
 </picture>
 
 </div>

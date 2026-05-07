@@ -1,0 +1,84 @@
+{
+  "spritesheet": "spritesheet.webp",
+  "frameWidth": 192,
+  "frameHeight": 208,
+  "scale": 1.35,
+  "animations": {
+    "idle": [
+      { "x": 0, "y": 0, "durationMs": 160 },
+      { "x": 192, "y": 0, "durationMs": 160 },
+      { "x": 384, "y": 0, "durationMs": 160 },
+      { "x": 576, "y": 0, "durationMs": 160 },
+      { "x": 768, "y": 0, "durationMs": 160 },
+      { "x": 960, "y": 0, "durationMs": 220 }
+    ],
+    "running-right": [
+      { "x": 0, "y": 208, "durationMs": 90 },
+      { "x": 192, "y": 208, "durationMs": 90 },
+      { "x": 384, "y": 208, "durationMs": 90 },
+      { "x": 576, "y": 208, "durationMs": 90 },
+      { "x": 768, "y": 208, "durationMs": 90 },
+      { "x": 960, "y": 208, "durationMs": 90 },
+      { "x": 1152, "y": 208, "durationMs": 90 },
+      { "x": 1344, "y": 208, "durationMs": 120 }
+    ],
+    "running-left": [
+      { "x": 0, "y": 416, "durationMs": 90 },
+      { "x": 192, "y": 416, "durationMs": 90 },
+      { "x": 384, "y": 416, "durationMs": 90 },
+      { "x": 576, "y": 416, "durationMs": 90 },
+      { "x": 768, "y": 416, "durationMs": 90 },
+      { "x": 960, "y": 416, "durationMs": 90 },
+      { "x": 1152, "y": 416, "durationMs": 90 },
+      { "x": 1344, "y": 416, "durationMs": 120 }
+    ],
+    "waving": [
+      { "x": 0, "y": 624, "durationMs": 180 },
+      { "x": 192, "y": 624, "durationMs": 180 },
+      { "x": 384, "y": 624, "durationMs": 180 },
+      { "x": 576, "y": 624, "durationMs": 260 }
+    ],
+    "jumping": [
+      { "x": 0, "y": 832, "durationMs": 120 },
+      { "x": 192, "y": 832, "durationMs": 120 },
+      { "x": 384, "y": 832, "durationMs": 120 },
+      { "x": 576, "y": 832, "durationMs": 120 },
+      { "x": 768, "y": 832, "durationMs": 180 }
+    ],
+    "waiting": [
+      { "x": 0, "y": 1248, "durationMs": 180 },
+      { "x": 192, "y": 1248, "durationMs": 180 },
+      { "x": 384, "y": 1248, "durationMs": 180 },
+      { "x": 576, "y": 1248, "durationMs": 180 },
+      { "x": 768, "y": 1248, "durationMs": 180 },
+      { "x": 960, "y": 1248, "durationMs": 240 }
+    ],
+    "running": [
+      { "x": 0, "y": 1456, "durationMs": 100 },
+      { "x": 192, "y": 1456, "durationMs": 100 },
+      { "x": 384, "y": 1456, "durationMs": 100 },
+      { "x": 576, "y": 1456, "durationMs": 100 },
+      { "x": 768, "y": 1456, "durationMs": 100 },
+      { "x": 960, "y": 1456, "durationMs": 140 }
+    ],
+    "review": [
+      { "x": 0, "y": 1664, "durationMs": 180 },
+      { "x": 192, "y": 1664, "durationMs": 180 },
+      { "x": 384, "y": 1664, "durationMs": 180 },
+      { "x": 576, "y": 1664, "durationMs": 180 },
+      { "x": 768, "y": 1664, "durationMs": 180 },
+      { "x": 960, "y": 1664, "durationMs": 240 }
+    ]
+  },
+  "profileSequence": [
+    "idle",
+    "waving",
+    "idle",
+    "running-right",
+    "jumping",
+    "running-left",
+    "waiting",
+    "running",
+    "review"
+  ]
+}
